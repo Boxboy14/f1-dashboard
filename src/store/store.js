@@ -3,8 +3,10 @@ import driverReducer from "./drivers/driverSlice.js";
 
 const store = configureStore({
   reducer: {
-    drivers: driverReducer,
+    Drivers: driverReducer,
   },
 });
+
+window.getState = () => store.getState();
 
 export default store;

@@ -18,7 +18,7 @@ const driverSlice = createSlice({
 });
 
 /**
- * Exports the reducer function from the driverSlice.
+ * Exports the reducer function from the <driverSlice className=""></driverSlice>
  *
  * The reducer is a pure function that takes the current state and an action,
  * then returns a new state based on the action type. This reducer handles all
@@ -31,4 +31,6 @@ const driverSlice = createSlice({
  * @type {Function}
  * @returns {Object} The updated driver state
  */
+
+export const { setDrivers } = driverSlice.actions;
 export default driverSlice.reducer;

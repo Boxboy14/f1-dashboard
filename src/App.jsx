@@ -1,7 +1,8 @@
 import "./App.css";
+import HomePage from "./components/dashboard/HomePage.jsx";
 
 function App() {
-  return <h2>Hello F1 Dashboard!</h2>;
+  return <HomePage />;
 }
 
 export default App;
