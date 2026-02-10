@@ -15,7 +15,7 @@ const HomePage = () => {
       try {
         const response = await fetch(DRIVERS_BASE_URL);
         const data = await response.json();
-        setDriverData(data);
+        setDriverData(data || []);
         if (data.length) {
           dispatch(setDrivers(data));
         }
