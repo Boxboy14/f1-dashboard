@@ -1,28 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setDrivers } from "../../store/drivers/driverSlice.js";
 import { DRIVERS_BASE_URL } from "../../services/api/baseUrls.js";
 import Navbar from "./Navbar/Navbar.jsx";
+import DriversGrid from "./DriversGrid/DriversGrid.jsx";
 
 const HomePage = () => {
-  const [driverData, setDriverData] = useState([]);
-  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchDrivers = async () => {
-      setLoading(true);
       try {
         const response = await fetch(DRIVERS_BASE_URL);
         const data = await response.json();
-        setDriverData(data || []);
         if (data.length) {
           dispatch(setDrivers(data));
         }
       } catch (error) {
         console.error("Failed to fetch drivers:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -32,8 +27,7 @@ const HomePage = () => {
   return (
     <>
       <Navbar />
-      <h3>Drivers Dashboard : {driverData.length}</h3>
-      {loading && <p>Loading drivers data...</p>}
+      <DriversGrid />
     </>
   );
 };
