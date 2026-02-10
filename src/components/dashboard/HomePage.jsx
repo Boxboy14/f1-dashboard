@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setDrivers } from "../../store/drivers/driverSlice.js";
 import { DRIVERS_BASE_URL } from "../../services/api/baseUrls.js";
+import Navbar from "./Navbar/Navbar.jsx";
 
 const HomePage = () => {
   const [driverData, setDriverData] = useState([]);
@@ -30,6 +31,7 @@ const HomePage = () => {
 
   return (
     <>
+      <Navbar />
       <h3>Drivers Dashboard : {driverData.length}</h3>
       {loading && <p>Loading drivers data...</p>}
     </>

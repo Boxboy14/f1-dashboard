@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+  areDriversReady: false,
   drivers: [],
 };
 
@@ -12,6 +13,7 @@ const driverSlice = createSlice({
       return {
         ...state,
         drivers: action.payload,
+        areDriversReady: true,
       };
     },
   },
