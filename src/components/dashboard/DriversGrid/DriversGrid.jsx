@@ -28,7 +28,21 @@ const columnDefs = [
 const DriversGrid = () => {
   const drivers = useSelector(driverSelector);
 
-  return <DataGrid columnDefs={columnDefs} rowData={drivers} />;
+  const onGridReady = (params) => {
+    // console.log(params);
+
+    params.api.sizeColumnsToFit();
+  };
+
+  return (
+    <div style={{ marginTop: "50px" }}>
+      <DataGrid
+        columnDefs={columnDefs}
+        rowData={drivers}
+        onGridReady={onGridReady}
+      />
+    </div>
+  );
 };
 
 export default DriversGrid;
