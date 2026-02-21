@@ -6,4 +6,11 @@ const driverSelector = createDraftSafeSelector(rootSelector, (driversState) => {
   return driversState.drivers || [];
 });
 
-export { driverSelector };
+const driverSearchSelector = createDraftSafeSelector(
+  driverSelector,
+  (drivers) => {
+    return drivers.map(({ full_name }) => full_name || "NA");
+  },
+);
+
+export { driverSelector, driverSearchSelector };

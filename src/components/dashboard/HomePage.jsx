@@ -22,7 +22,7 @@ const HomePage = () => {
     };
 
     fetchDrivers();
-  }, [dispatch]);
+  });
 
   return (
     <>

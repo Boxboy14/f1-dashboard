@@ -14,6 +14,7 @@
     "@salt-ds/core": "^1.54.1",
     "@salt-ds/icons": "^1.16.0",
     "@salt-ds/lab": "^1.0.0-alpha.83",
+    "@salt-ds/theme": "^1.40.0",
     "ag-grid-community": "^35.0.0",
     "ag-grid-react": "^35.0.0",
     "lodash": "^4.17.21",

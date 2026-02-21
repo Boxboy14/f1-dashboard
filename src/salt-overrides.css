@@ -1,0 +1,7 @@
+.salt-theme {
+  --salt-text-fontFamily: var(--font-family-primary);
+  --salt-text-fontSize: var(--font-size-base);
+  --salt-text-lineHeight: var(--line-height-normal);
+  --salt-text-letterSpacing: normal;
+  --salt-text-fontWeight: var(--font-weight-normal);
+}

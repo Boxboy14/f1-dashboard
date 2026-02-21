@@ -6,8 +6,6 @@ const defaultColDefs = {
   filter: true,
   floatingFilter: true,
   resizable: true,
-  flex: 1,
-  minWidth: 120,
 };
 
 const gridTheme = themeQuartz.withParams({
