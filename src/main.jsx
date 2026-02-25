@@ -11,6 +11,7 @@ import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import store from "./store/store.js";
 import { Provider } from "react-redux";
 import { SaltProvider } from "@salt-ds/core";
+import { BrowserRouter } from "react-router-dom";
 
 // Register the community modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -18,9 +19,11 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <SaltProvider mode="dark" applyClassesTo="root">
-      <StrictMode>
-        <App />
-      </StrictMode>
+      <BrowserRouter>
+        <StrictMode>
+          <App />
+        </StrictMode>
+      </BrowserRouter>
     </SaltProvider>
   </Provider>,
 );

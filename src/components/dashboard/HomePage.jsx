@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setDrivers } from "../../store/drivers/driverSlice.js";
 import { DRIVERS_BASE_URL } from "../../services/api/baseUrls.js";
-import Navbar from "./Navbar/Navbar.jsx";
 import DriversGrid from "./DriversGrid/DriversGrid.jsx";
 
 const HomePage = () => {
@@ -22,14 +21,9 @@ const HomePage = () => {
     };
 
     fetchDrivers();
-  });
+  }, [dispatch]);
 
-  return (
-    <>
-      <Navbar />
-      <DriversGrid />
-    </>
-  );
+  return <DriversGrid />;
 };
 
 export default HomePage;
