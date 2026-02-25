@@ -9,8 +9,10 @@ const driverSelector = createDraftSafeSelector(rootSelector, (driversState) => {
       ({ first_name, last_name, country_code, ...rest }) => {
         return {
           ...rest,
-          full_name: `${first_name} ${last_name}`,
           country_code: getCountryName(country_code),
+          full_name: `${first_name} ${last_name}`,
+          first_name,
+          last_name,
         };
       },
     ) || []
