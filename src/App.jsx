@@ -9,7 +9,9 @@ function App() {
       <Route path="/" element={<DashboardLayout />}>
         <Route index element={<Navigate to="/drivers" replace />} />
         <Route path="drivers" element={<HomePage />} />
+        <Route path="drivers/:driverSlug" element={<HomePage />} />
       </Route>
+      {/* <Route path="/sessions" element={<HomePage />} /> */}
     </Routes>
   );
 }

@@ -4,4 +4,8 @@ const getCountryName = (countryCode) => {
   return COUNTRY_CODE_MAP[countryCode] || countryCode;
 };
 
-export { getCountryName };
+const createDriverSlug = ({ full_name }) => {
+  return full_name.split(" ").join("-").toLowerCase();
+};
+
+export { getCountryName, createDriverSlug };

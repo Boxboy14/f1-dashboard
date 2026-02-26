@@ -1,19 +1,42 @@
-import { useMemo, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { useCallback, useMemo } from "react";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { createDriverSlug } from "../../../store/drivers/utils.js";
 import Navbar from "../Navbar/Navbar.jsx";
 import DriverInfoCard from "../DriversGrid/DriverInfoCard.jsx";
+import { useSelector } from "react-redux";
+import { driverSelector } from "../../../store/drivers/selector.js";
 
 const DashboardLayout = () => {
-  const [selectedDriver, setSelectedDriver] = useState(undefined);
-  const [isInfoDialogOpen, setIsInfoDialogOpen] = useState(false);
+  const navigate = useNavigate();
+  const { driverSlug } = useParams();
+  const drivers = useSelector(driverSelector);
 
-  const openDriverInfo = (driver) => {
-    if (!driver) {
-      return;
+  const selectedDriver = useMemo(() => {
+    if (!driverSlug) {
+      return undefined;
     }
 
-    setSelectedDriver(driver);
-    setIsInfoDialogOpen(true);
+    return drivers.find((driver) => createDriverSlug(driver) === driverSlug);
+  }, [driverSlug, drivers]);
+
+  const openDriverInfo = useCallback(
+    (driver) => {
+      if (!driver) {
+        return;
+      }
+
+      const driverSlug = createDriverSlug(driver);
+      if (driverSlug) {
+        navigate(`/drivers/${driverSlug}`);
+      }
+    },
+    [navigate],
+  );
+
+  const handleInfoDialogOpenChange = (isOpen) => {
+    if (!isOpen) {
+      navigate("/drivers");
+    }
   };
 
   const dialogId = useMemo(() => {
@@ -31,8 +54,8 @@ const DashboardLayout = () => {
       <DriverInfoCard
         driverData={selectedDriver}
         id={dialogId}
-        isOpen={isInfoDialogOpen}
-        setIsInfoDialogOpen={setIsInfoDialogOpen}
+        isOpen={Boolean(driverSlug && selectedDriver)}
+        setIsInfoDialogOpen={handleInfoDialogOpenChange}
       />
     </>
   );
