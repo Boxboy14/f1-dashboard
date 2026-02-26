@@ -1,0 +1,94 @@
+.content {
+  width: 90%;
+  margin: 0 auto;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+}
+
+.profileSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.driverPhoto {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--salt-separable-tertiary-borderColor);
+}
+
+.driverPhotoFallback {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--salt-container-secondary-background);
+  color: var(--salt-content-secondary-foreground);
+  border: 2px solid var(--salt-separable-tertiary-borderColor);
+  font-size: 0.9rem;
+}
+
+.dialogWidth {
+  width: 50vw;
+}
+
+.dialogWidth :global(.saltDialogHeader-header > .saltText) {
+  font-family: var(--font-family-primary) !important;
+  font-size: var(--font-size-xl) !important;
+  font-weight: var(--font-weight-semibold) !important;
+  line-height: var(--line-height-tight) !important;
+}
+
+.broadcastName {
+  margin-top: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-family-primary);
+  text-align: center;
+}
+
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.5rem;
+}
+
+.field {
+  width: 100%;
+}
+
+.formLabel {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.field :global(.saltFormFieldLabel.saltText) {
+  font-family: var(--font-family-primary) !important;
+  font-size: var(--font-size-sm) !important;
+  font-weight: var(--font-weight-semibold) !important;
+}
+
+.fieldInput {
+  width: 100%;
+}
+
+.fieldInput :global(input) {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+}
+
+@media (max-width: 720px) {
+  .content {
+    width: min(94vw, 440px);
+  }
+
+  .fieldsGrid {
+    grid-template-columns: 1fr;
+  }
+}
