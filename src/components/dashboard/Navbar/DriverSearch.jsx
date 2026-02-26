@@ -1,12 +1,12 @@
 import { ComboBox, Option, Button } from "@salt-ds/core";
 import { SearchIcon, CloseIcon } from "@salt-ds/icons";
 import { useMemo, useState } from "react";
-import { driverSearchSelector } from "../../../store/drivers/selector.js";
+import { driverSelector } from "../../../store/drivers/selector.js";
 import { useSelector } from "react-redux";
 import styles from "./DriverSearch.module.scss";
 
-const DriverSearchBar = () => {
-  const driverSearchValues = useSelector(driverSearchSelector);
+const DriverSearchBar = ({ onDriverSelect = () => {} }) => {
+  const drivers = useSelector(driverSelector);
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
@@ -19,10 +19,10 @@ const DriverSearchBar = () => {
       return [];
     }
 
-    return driverSearchValues.filter((name) =>
-      name.toLowerCase().includes(normalizedQuery),
+    return drivers.filter(({ full_name }) =>
+      full_name.toLowerCase().includes(normalizedQuery),
     );
-  }, [driverSearchValues, query]);
+  }, [drivers, query]);
 
   const handleChange = (event) => {
     const value = event.target.value;
@@ -31,8 +31,8 @@ const DriverSearchBar = () => {
     const normalizedQuery = normalizeQuery(value);
     const liveResults = !normalizedQuery
       ? []
-      : driverSearchValues.filter((name) =>
-          name.toLowerCase().includes(normalizedQuery),
+      : drivers.filter(({ full_name }) =>
+          full_name.toLowerCase().includes(normalizedQuery),
         );
 
     setIsOpen(normalizedQuery.length > 0 && liveResults.length > 0);
@@ -54,8 +54,13 @@ const DriverSearchBar = () => {
         onSelectionChange={(_, selectedValues) => {
           if (selectedValues.length) {
             const selectedName = selectedValues[0];
+            const selectedDriver = drivers.find(
+              ({ full_name }) => full_name === selectedName,
+            );
+
             setQuery(selectedName);
             setIsOpen(false);
+            onDriverSelect(selectedDriver);
           }
         }}
         placeholder="Search Drivers...."
@@ -67,8 +72,8 @@ const DriverSearchBar = () => {
           )
         }
       >
-        {filteredDrivers.map((name) => (
-          <Option value={name} key={name} />
+        {filteredDrivers.map(({ full_name, driver_number }) => (
+          <Option value={full_name} key={`${full_name}-${driver_number}`} />
         ))}
       </ComboBox>
     </>
