@@ -1,12 +1,11 @@
 import { ComboBox, Option, Button } from "@salt-ds/core";
 import { SearchIcon, CloseIcon } from "@salt-ds/icons";
 import { useMemo, useState } from "react";
-import { driverSelector } from "../../../store/drivers/selector.js";
-import { useSelector } from "react-redux";
+import { useDrivers } from "../../../hooks/useOpenF1.js";
 import styles from "./DriverSearch.module.scss";
 
 const DriverSearchBar = ({ onDriverSelect = () => {} }) => {
-  const drivers = useSelector(driverSelector);
+  const { data: drivers = [] } = useDrivers({ session_key: "latest" });
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
@@ -14,11 +13,7 @@ const DriverSearchBar = ({ onDriverSelect = () => {} }) => {
 
   const filteredDrivers = useMemo(() => {
     const normalizedQuery = normalizeQuery(query);
-
-    if (!normalizedQuery) {
-      return [];
-    }
-
+    if (!normalizedQuery) return [];
     return drivers.filter(({ full_name }) =>
       full_name.toLowerCase().includes(normalizedQuery),
     );
@@ -27,15 +22,13 @@ const DriverSearchBar = ({ onDriverSelect = () => {} }) => {
   const handleChange = (event) => {
     const value = event.target.value;
     setQuery(value);
-
     const normalizedQuery = normalizeQuery(value);
-    const liveResults = !normalizedQuery
-      ? []
-      : drivers.filter(({ full_name }) =>
-          full_name.toLowerCase().includes(normalizedQuery),
-        );
-
-    setIsOpen(normalizedQuery.length > 0 && liveResults.length > 0);
+    const hasResults =
+      normalizedQuery.length > 0 &&
+      drivers.some(({ full_name }) =>
+        full_name.toLowerCase().includes(normalizedQuery),
+      );
+    setIsOpen(hasResults);
   };
 
   const handleClearSelectedValue = () => {
@@ -57,7 +50,6 @@ const DriverSearchBar = ({ onDriverSelect = () => {} }) => {
             const selectedDriver = drivers.find(
               ({ full_name }) => full_name === selectedName,
             );
-
             setQuery(selectedName);
             setIsOpen(false);
             onDriverSelect(selectedDriver);

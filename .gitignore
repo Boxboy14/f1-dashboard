@@ -7,10 +7,22 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies & build output
 node_modules
 dist
 dist-ssr
-*.local
+
+# Environment variables (never commit API keys)
+.env
+.env.local
+.env.*.local
+
+# Claude Code — local session permissions (machine-specific, changes every session)
+.claude/settings.local.json
+
+# CLAUDE.md — project-level AI instructions (personal config, not shared)
+claude.md
+CLAUDE.md
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +34,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+

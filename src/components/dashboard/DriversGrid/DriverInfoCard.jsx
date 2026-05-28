@@ -16,7 +16,7 @@ const DriverInfoCard = ({ isOpen, driverData, setIsInfoDialogOpen, id }) => {
     full_name,
     driver_number,
     team_name,
-    country_code,
+    country_name,
     broadcast_name,
     headshot_url,
   } = driverData ?? {};
@@ -29,7 +29,7 @@ const DriverInfoCard = ({ isOpen, driverData, setIsInfoDialogOpen, id }) => {
     { label: "Full Name", value: full_name },
     { label: "Driver Number", value: driver_number },
     { label: "Team Name", value: team_name },
-    { label: "Country", value: country_code },
+    { label: "Country", value: country_name },
     { label: "Broadcast Name", value: broadcast_name },
   ];
 

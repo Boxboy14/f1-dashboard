@@ -15,6 +15,7 @@
     "@salt-ds/icons": "^1.16.0",
     "@salt-ds/lab": "^1.0.0-alpha.83",
     "@salt-ds/theme": "^1.40.0",
+    "@tanstack/react-query": "^5.100.14",
     "ag-grid-community": "^35.0.0",
     "ag-grid-react": "^35.0.0",
     "lodash": "^4.17.21",
@@ -23,6 +24,7 @@
     "react-redux": "^9.2.0",
     "react-router": "^7.12.0",
     "react-router-dom": "^7.12.0",
+    "recharts": "^3.8.1",
     "reselect": "^5.1.1"
   },
   "devDependencies": {
