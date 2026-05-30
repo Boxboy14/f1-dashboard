@@ -12,7 +12,7 @@
 
 **Purpose**: Confirm the baseline works before touching anything.
 
-- [ ] T001 Start dev server (`npm run dev`) and verify `/drivers` loads the existing grid with 2025 driver data — no code changes, just confirm green starting state.
+- [x] T001 Start dev server (`npm run dev`) and verify `/drivers` loads the existing grid with 2025 driver data — no code changes, just confirm green starting state.
 
 ---
 
@@ -22,7 +22,7 @@
 
 **⚠️ CRITICAL**: No user story tasks can begin until T002 is complete.
 
-- [ ] T002 Add `useDriversByYear(year)` export to `src/hooks/useOpenF1.js` — compose the existing `useSessions` and `useDrivers` hooks using TanStack Query's dependent query pattern:
+- [x] T002 Add `useDriversByYear(year)` export to `src/hooks/useOpenF1.js` — compose the existing `useSessions` and `useDrivers` hooks using TanStack Query's dependent query pattern:
   ```js
   export function useDriversByYear(year) {
     const { data: sessions = [] } = useSessions({ year, session_type: "Race" });
@@ -47,12 +47,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Update `src/components/dashboard/DriversGrid/DriversGrid.jsx`:
+- [x] T003 [US1] Update `src/components/dashboard/DriversGrid/DriversGrid.jsx`:
   - Change props from `{ onDriverOpen = () => {} }` to `{ year, onDriverOpen = () => {} }`
   - Replace `useDrivers({ session_key: "latest" })` with `useDriversByYear(year)` (import from `../../../hooks/useOpenF1.js`)
   - Remove the `useDrivers` import if it is no longer used directly in this file
 
-- [ ] T004 [US1] Update `src/components/dashboard/HomePage.jsx`:
+- [x] T004 [US1] Update `src/components/dashboard/HomePage.jsx`:
   - Add `import { useSearchParams } from "react-router-dom"`
   - Read the year from search params with default: `const [searchParams] = useSearchParams(); const year = Number(searchParams.get("year") ?? "2025");`
   - Pass `year` to `DriversGrid`: `<DriversGrid year={year} onDriverOpen={openDriverInfo} />`
@@ -70,18 +70,18 @@
 
 ### Implementation for User Story 2
 
-- [ ] T005 [P] [US2] Create `src/components/dashboard/DriversGrid/YearSelector.jsx` — a controlled Salt DS `Dropdown`:
+- [x] T005 [P] [US2] Create `src/components/dashboard/DriversGrid/YearSelector.jsx` — a controlled Salt DS `Dropdown`:
   - Props: `{ value: number, onChange: (year: number) => void }`
   - Options list: `[2023, 2024, 2025]` (as strings for Dropdown, converted back to number in `onChange`)
   - Import `Dropdown` from `@salt-ds/core`
   - The selected item is the string matching `String(value)`
   - On selection: call `onChange(Number(selectedString))`
 
-- [ ] T006 [P] [US2] Create `src/components/dashboard/DriversGrid/YearSelector.module.scss` — minimal styles:
+- [x] T006 [P] [US2] Create `src/components/dashboard/DriversGrid/YearSelector.module.scss` — minimal styles:
   - Set a fixed width on the dropdown container so it doesn't stretch (e.g., `width: 120px`)
   - No other custom styles needed; Salt DS handles appearance
 
-- [ ] T007 [US2] Update `src/components/dashboard/HomePage.jsx` (builds on T004):
+- [x] T007 [US2] Update `src/components/dashboard/HomePage.jsx` (builds on T004):
   - Add `import { useSearchParams } from "react-router-dom"` (update existing import to destructure setter too): `const [searchParams, setSearchParams] = useSearchParams()`
   - Add year change handler: `const handleYearChange = (newYear) => setSearchParams({ year: String(newYear) })`
   - Import `FlexLayout` from `@salt-ds/core`
@@ -106,7 +106,7 @@
 
 **Purpose**: Clean up pre-existing code smell touched during this feature.
 
-- [ ] T008 Move the `style={{ marginTop: "24px" }}` inline style out of `src/components/dashboard/DriversGrid/DriversGrid.jsx`:
+- [x] T008 Move the `style={{ marginTop: "24px" }}` inline style out of `src/components/dashboard/DriversGrid/DriversGrid.jsx`:
   - Create `src/components/dashboard/DriversGrid/DriversGrid.module.scss` with `.grid { margin-top: 24px; }`
   - Import it in `DriversGrid.jsx` and replace the inline style with `className={styles.grid}`
 
