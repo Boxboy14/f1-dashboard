@@ -4,12 +4,14 @@ import { useDrivers } from "../../../hooks/useOpenF1.js";
 const columnDefs = [
   { headerName: "Driver Name", field: "full_name", sortable: true },
   { headerName: "Driver Number", field: "driver_number", sortable: true },
-  { headerName: "Nationality", field: "country_name", sortable: true },
+  //   { headerName: "Nationality", field: "country_name", sortable: true },
   { headerName: "Constructor", field: "team_name", sortable: true },
 ];
 
 const DriversGrid = ({ onDriverOpen = () => {} }) => {
-  const { data: drivers = [], isLoading } = useDrivers({ session_key: "latest" });
+  const { data: drivers = [], isLoading } = useDrivers({
+    session_key: "latest",
+  });
 
   const onGridReady = ({ api }) => api.sizeColumnsToFit();
   const onRowDoubleClicked = ({ data }) => onDriverOpen(data);

@@ -11,7 +11,8 @@ This is the working plan for the F1 Dashboard. Claude Code refers to this when g
 **Why:** Sharpen frontend skills, learn AI integration, and ship a real product the developer would use.
 
 **In scope (v1):**
-- Historical data from **2023 onwards** (OpenF1 free tier).
+- Historical data from **2023 onwards** (OpenF1 free tier — 3 seasons: 2023, 2024, 2025).
+- Single data source: OpenF1 only. No secondary APIs.
 - Desktop + mobile responsive UI.
 - Dark theme only.
 - All four viz styles: line/bar charts, SVG track map, telemetry overlays, tire-strategy timelines.
@@ -38,7 +39,7 @@ This is the working plan for the F1 Dashboard. Claude Code refers to this when g
 | Charts | Recharts (Phase 2) | Line/bar/scatter charts |
 | Track map | Custom SVG (Phase 2) | OpenF1 location coords |
 | Styles | SCSS Modules | No inline styles except dynamic values |
-| API | OpenF1 (`https://api.openf1.org/v1`) | Historical F1 data |
+| API | OpenF1 (`https://api.openf1.org/v1`) | All F1 data — single source |
 | Spec workflow | GitHub Speckit | `/speckit-specify` → `/speckit-plan` → `/speckit-tasks` → `/speckit-implement` |
 
 ---
@@ -160,7 +161,7 @@ Constitution: `.specify/memory/constitution.md` (Articles I–VII).
 
 **Base:** `https://api.openf1.org/v1`
 **Rate limit (free):** 3 req/sec, 30 req/min.
-**Coverage (free):** Historical data, 2023 onwards.
+**Coverage:** 2023 onwards (2023, 2024, 2025).
 
 | Need | Endpoint | Key params |
 |---|---|---|

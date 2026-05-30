@@ -12,14 +12,8 @@ import { CloseIcon } from "@salt-ds/icons";
 import styles from "./driverGridCss/DriverInfoCard.module.scss";
 
 const DriverInfoCard = ({ isOpen, driverData, setIsInfoDialogOpen, id }) => {
-  const {
-    full_name,
-    driver_number,
-    team_name,
-    country_name,
-    broadcast_name,
-    headshot_url,
-  } = driverData ?? {};
+  const { full_name, driver_number, team_name, broadcast_name, headshot_url } =
+    driverData ?? {};
 
   const handleOnClickClose = () => setIsInfoDialogOpen(false);
 
@@ -29,7 +23,6 @@ const DriverInfoCard = ({ isOpen, driverData, setIsInfoDialogOpen, id }) => {
     { label: "Full Name", value: full_name },
     { label: "Driver Number", value: driver_number },
     { label: "Team Name", value: team_name },
-    { label: "Country", value: country_name },
     { label: "Broadcast Name", value: broadcast_name },
   ];
 
