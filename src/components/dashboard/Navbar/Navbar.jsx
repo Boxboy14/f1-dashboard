@@ -17,7 +17,7 @@ const Navbar = ({ onDriverSelect, onMenuClick, year, onYearChange }) => {
         <div className={styles.brand}>F1 Dashboard</div>
       </div>
       <div className={styles.right}>
-        <DriverSearchBar onDriverSelect={onDriverSelect} />
+        <DriverSearchBar onDriverSelect={onDriverSelect} year={year} />
         <YearSelector value={year} onChange={onYearChange} />
       </div>
     </header>

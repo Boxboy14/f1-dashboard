@@ -1,11 +1,11 @@
 import { ComboBox, Option, Button } from "@salt-ds/core";
 import { SearchIcon, CloseIcon } from "@salt-ds/icons";
 import { useMemo, useState } from "react";
-import { useDrivers } from "../../../hooks/useOpenF1.js";
+import { useDriversByYear } from "../../../hooks/useOpenF1.js";
 import styles from "./DriverSearch.module.scss";
 
-const DriverSearchBar = ({ onDriverSelect = () => {} }) => {
-  const { data: drivers = [] } = useDrivers({ session_key: "latest" });
+const DriverSearchBar = ({ onDriverSelect = () => {}, year }) => {
+  const { data: drivers = [] } = useDriversByYear(year);
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
