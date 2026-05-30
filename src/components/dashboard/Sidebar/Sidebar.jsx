@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useSearchParams } from "react-router-dom";
 import {
   DashboardIcon,
   UserIcon,
@@ -19,6 +19,9 @@ const NAV_ITEMS = [
 ];
 
 const Sidebar = ({ isOpen, onClose }) => {
+  const [searchParams] = useSearchParams();
+  const year = searchParams.get("year");
+
   return (
     <>
       {isOpen && <div className={styles.overlay} onClick={onClose} />}
@@ -27,7 +30,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           {NAV_ITEMS.map(({ label, icon: Icon, path, disabled }) => (
             <NavLink
               key={path}
-              to={path}
+              to={{ pathname: path, search: year ? `year=${year}` : "" }}
               onClick={disabled ? (e) => e.preventDefault() : onClose}
               className={({ isActive }) =>
                 [

@@ -23,6 +23,15 @@ export function useDrivers(params, options) {
   });
 }
 
+export function useDriversByYear(year) {
+  const { data: sessions = [] } = useSessions({ year, session_type: "Race" });
+  const lastSessionKey = sessions.at(-1)?.session_key;
+  return useDrivers(
+    { session_key: lastSessionKey },
+    { enabled: Boolean(lastSessionKey) }
+  );
+}
+
 export function useSessions(params, options) {
   return useQuery({
     queryKey: ["sessions", params],

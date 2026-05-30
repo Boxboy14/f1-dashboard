@@ -1,5 +1,6 @@
 import DataGrid from "../../DataGrid.jsx";
-import { useDrivers } from "../../../hooks/useOpenF1.js";
+import { useDriversByYear } from "../../../hooks/useOpenF1.js";
+import styles from "./DriversGrid.module.scss";
 
 const columnDefs = [
   { headerName: "Driver Name", field: "full_name", sortable: true },
@@ -8,10 +9,8 @@ const columnDefs = [
   { headerName: "Constructor", field: "team_name", sortable: true },
 ];
 
-const DriversGrid = ({ onDriverOpen = () => {} }) => {
-  const { data: drivers = [], isLoading } = useDrivers({
-    session_key: "latest",
-  });
+const DriversGrid = ({ year, onDriverOpen = () => {} }) => {
+  const { data: drivers = [], isLoading } = useDriversByYear(year);
 
   const onGridReady = ({ api }) => api.sizeColumnsToFit();
   const onRowDoubleClicked = ({ data }) => onDriverOpen(data);
@@ -19,7 +18,7 @@ const DriversGrid = ({ onDriverOpen = () => {} }) => {
     `${first_name}-${driver_number}`;
 
   return (
-    <div style={{ marginTop: "24px" }}>
+    <div className={styles.grid}>
       <DataGrid
         columnDefs={columnDefs}
         getRowId={getRowId}
