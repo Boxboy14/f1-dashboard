@@ -8,12 +8,14 @@ import {
   Input,
 } from "@salt-ds/core";
 import { CloseIcon } from "@salt-ds/icons";
+import TEAM_LOGO_MAP from "../../../constants/teamLogos.js";
 import styles from "./TeamDetailCard.module.scss";
 
 const TeamDetailCard = ({ isOpen, teamData, id, setIsDetailOpen }) => {
   if (!teamData) return null;
 
   const { team_name, position_current, points_current, drivers } = teamData;
+  const logoUrl = TEAM_LOGO_MAP[team_name];
 
   const closeButton = (
     <Button
@@ -33,7 +35,15 @@ const TeamDetailCard = ({ isOpen, teamData, id, setIsDetailOpen }) => {
       size="medium"
       onOpenChange={setIsDetailOpen}
     >
-      <DialogHeader header={team_name} actions={closeButton} />
+      <DialogHeader
+        header={
+          <span className={styles.dialogHeader}>
+            {team_name}
+            {logoUrl && <img src={logoUrl} alt="" className={styles.headerLogo} />}
+          </span>
+        }
+        actions={closeButton}
+      />
       <DialogContent className={styles.content}>
         <div className={styles.teamSummary}>
           <FormField className={styles.field}>

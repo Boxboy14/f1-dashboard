@@ -7,8 +7,8 @@ const TeamCellRenderer = ({ value, data }) => {
   const logoUrl = TEAM_LOGO_MAP[data?.team_name];
   return (
     <span className={styles.teamCell}>
-      {logoUrl && <img src={logoUrl} alt="" className={styles.teamLogo} />}
       {value}
+      {logoUrl && <img src={logoUrl} alt="" className={styles.teamLogo} />}
     </span>
   );
 };

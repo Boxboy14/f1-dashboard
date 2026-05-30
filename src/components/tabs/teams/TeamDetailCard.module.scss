@@ -2,11 +2,21 @@
   width: 50vw;
 }
 
-.dialogWidth :global(.saltDialogHeader-header > .saltText) {
-  font-family: var(--font-family-primary) !important;
-  font-size: var(--font-size-xl) !important;
-  font-weight: var(--font-weight-semibold) !important;
-  line-height: var(--line-height-tight) !important;
+.dialogHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.headerLogo {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .content {
