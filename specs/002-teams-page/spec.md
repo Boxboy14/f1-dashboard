@@ -68,6 +68,7 @@ An F1 fan wants to dig deeper into a specific constructor's season. They click o
 - **FR-010**: The team detail page MUST show both drivers' individual championship points and rank within the selected season.
 - **FR-011**: The selected season MUST persist in the URL when navigating to a team detail page (e.g., `?year=2023`).
 - **FR-012**: Navigating back from a team detail page MUST return the user to the teams grid with the season selection intact.
+- **FR-013**: Each team row MUST display a visual color indicator using the team's official constructor color, so users can identify teams at a glance without reading the name.
 
 ### Key Entities
 
@@ -89,7 +90,7 @@ An F1 fan wants to dig deeper into a specific constructor's season. They click o
 
 - The selected season is controlled globally via the season selector in the navigation bar — the Teams page reads this value and does not own its own season picker.
 - Data coverage is limited to 2023, 2024, and 2025 (OpenF1 free tier). Seasons outside this range are not supported.
-- Team color/branding is a nice-to-have and is not required for this feature. The grid communicates identity through team name and driver names.
+- Each team row is highlighted with the team's official constructor color as a left border accent (FR-013). The `team_colour` value from the OpenF1 API is a hex string without a leading `#` (e.g., `"F47600"`) and must be prefixed before use in CSS.
 - A "team detail page" for this feature scope covers driver-level championship data only. Race-by-race results and head-to-head comparisons are deferred to a future feature iteration.
 - When a team has a mid-season driver change, both drivers who scored points for the team appear in the detail view. The grid row shows the most prominent two drivers (highest points earners).
 - The teams grid displays the final or most recent championship standings for the selected season — it does not show round-by-round progression.
