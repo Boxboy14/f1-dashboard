@@ -1,0 +1,77 @@
+.dialogWidth {
+  width: 50vw;
+}
+
+.dialogWidth :global(.saltDialogHeader-header > .saltText) {
+  font-family: var(--font-family-primary) !important;
+  font-size: var(--font-size-xl) !important;
+  font-weight: var(--font-weight-semibold) !important;
+  line-height: var(--line-height-tight) !important;
+}
+
+.content {
+  width: 90%;
+  margin: 0 auto;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+}
+
+.teamSummary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.driverSection {
+  border-top: 1px solid var(--salt-separable-tertiary-borderColor);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.driverName {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0.75rem;
+}
+
+.statRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.formLabel {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.field :global(.saltFormFieldLabel.saltText) {
+  font-family: var(--font-family-primary) !important;
+  font-size: var(--font-size-sm) !important;
+  font-weight: var(--font-weight-semibold) !important;
+}
+
+.fieldInput {
+  width: 100%;
+}
+
+.fieldInput :global(input) {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+}
+
+@media (max-width: 720px) {
+  .content {
+    width: min(94vw, 440px);
+  }
+
+  .teamSummary,
+  .statRow {
+    grid-template-columns: 1fr;
+  }
+}

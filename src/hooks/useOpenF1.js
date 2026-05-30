@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { openF1Api } from "../services/api/openf1.js";
 import { COUNTRY_CODE_MAP } from "../constants/countryMap.js";
@@ -156,4 +157,71 @@ export function useOvertakes(params, options) {
     enabled: Boolean(params?.session_key),
     ...options,
   });
+}
+
+export function useTeamsByYear(year) {
+  const { data: sessions = [] } = useSessions({ year, session_type: "Race" });
+  const lastSessionKey = sessions.at(-1)?.session_key;
+
+  const { data: teamStandings = [], isLoading: isLoadingTeams } =
+    useChampionshipTeams(
+      { session_key: lastSessionKey },
+      { enabled: Boolean(lastSessionKey) }
+    );
+
+  const { data: driverStandings = [], isLoading: isLoadingDriverStandings } =
+    useChampionshipDrivers(
+      { session_key: lastSessionKey },
+      { enabled: Boolean(lastSessionKey) }
+    );
+
+  const { data: drivers = [], isLoading: isLoadingDrivers } = useDrivers(
+    { session_key: lastSessionKey },
+    { enabled: Boolean(lastSessionKey) }
+  );
+
+  const isLoading =
+    !lastSessionKey ||
+    isLoadingTeams ||
+    isLoadingDriverStandings ||
+    isLoadingDrivers;
+
+  const data = useMemo(() => {
+    if (!teamStandings.length || !drivers.length) return [];
+
+    const driverStandingMap = new Map(
+      driverStandings.map((ds) => [ds.driver_number, ds])
+    );
+
+    const driversByTeam = new Map();
+    for (const driver of drivers) {
+      const standing = driverStandingMap.get(driver.driver_number);
+      const enriched = {
+        driver_number: driver.driver_number,
+        full_name: driver.full_name,
+        headshot_url: driver.headshot_url,
+        team_colour: driver.team_colour,
+        championship: standing
+          ? {
+              position_current: standing.position_current,
+              points_current: standing.points_current,
+            }
+          : null,
+      };
+      const existing = driversByTeam.get(driver.team_name) ?? [];
+      driversByTeam.set(driver.team_name, [...existing, enriched]);
+    }
+
+    return teamStandings
+      .map((team) => ({
+        team_name: team.team_name,
+        position_current: team.position_current,
+        points_current: team.points_current,
+        team_colour: driversByTeam.get(team.team_name)?.[0]?.team_colour ?? null,
+        drivers: driversByTeam.get(team.team_name) ?? [],
+      }))
+      .sort((a, b) => a.position_current - b.position_current);
+  }, [teamStandings, driverStandings, drivers]);
+
+  return { data, isLoading };
 }
