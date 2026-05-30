@@ -12,7 +12,7 @@ function transformDrivers(data) {
   }));
 }
 
-export function useDrivers(params, options) {
+function useDrivers(params, options) {
   return useQuery({
     queryKey: ["drivers", params],
     queryFn: async () => {
@@ -24,7 +24,7 @@ export function useDrivers(params, options) {
   });
 }
 
-export function useDriversByYear(year) {
+function useDriversByYear(year) {
   const { data: sessions = [] } = useSessions({ year, session_type: "Race" });
   const lastSessionKey = sessions.at(-1)?.session_key;
   return useDrivers(
@@ -33,7 +33,7 @@ export function useDriversByYear(year) {
   );
 }
 
-export function useSessions(params, options) {
+function useSessions(params, options) {
   return useQuery({
     queryKey: ["sessions", params],
     queryFn: () => openF1Api.sessions(params),
@@ -42,7 +42,7 @@ export function useSessions(params, options) {
   });
 }
 
-export function useMeetings(params, options) {
+function useMeetings(params, options) {
   return useQuery({
     queryKey: ["meetings", params],
     queryFn: () => openF1Api.meetings(params),
@@ -51,7 +51,7 @@ export function useMeetings(params, options) {
   });
 }
 
-export function useLaps(params, options) {
+function useLaps(params, options) {
   return useQuery({
     queryKey: ["laps", params],
     queryFn: () => openF1Api.laps(params),
@@ -61,7 +61,7 @@ export function useLaps(params, options) {
   });
 }
 
-export function useChampionshipDrivers(params, options) {
+function useChampionshipDrivers(params, options) {
   return useQuery({
     queryKey: ["championship_drivers", params],
     queryFn: () => openF1Api.championshipDrivers(params),
@@ -70,7 +70,7 @@ export function useChampionshipDrivers(params, options) {
   });
 }
 
-export function useChampionshipTeams(params, options) {
+function useChampionshipTeams(params, options) {
   return useQuery({
     queryKey: ["championship_teams", params],
     queryFn: () => openF1Api.championshipTeams(params),
@@ -79,7 +79,7 @@ export function useChampionshipTeams(params, options) {
   });
 }
 
-export function useSessionResult(params, options) {
+function useSessionResult(params, options) {
   return useQuery({
     queryKey: ["session_result", params],
     queryFn: () => openF1Api.sessionResult(params),
@@ -89,7 +89,7 @@ export function useSessionResult(params, options) {
   });
 }
 
-export function useStartingGrid(params, options) {
+function useStartingGrid(params, options) {
   return useQuery({
     queryKey: ["starting_grid", params],
     queryFn: () => openF1Api.startingGrid(params),
@@ -99,7 +99,7 @@ export function useStartingGrid(params, options) {
   });
 }
 
-export function usePit(params, options) {
+function usePit(params, options) {
   return useQuery({
     queryKey: ["pit", params],
     queryFn: () => openF1Api.pit(params),
@@ -109,7 +109,7 @@ export function usePit(params, options) {
   });
 }
 
-export function useStints(params, options) {
+function useStints(params, options) {
   return useQuery({
     queryKey: ["stints", params],
     queryFn: () => openF1Api.stints(params),
@@ -119,7 +119,7 @@ export function useStints(params, options) {
   });
 }
 
-export function useCarData(params, options) {
+function useCarData(params, options) {
   return useQuery({
     queryKey: ["car_data", params],
     queryFn: () => openF1Api.carData(params),
@@ -129,7 +129,7 @@ export function useCarData(params, options) {
   });
 }
 
-export function useWeather(params, options) {
+function useWeather(params, options) {
   return useQuery({
     queryKey: ["weather", params],
     queryFn: () => openF1Api.weather(params),
@@ -139,7 +139,7 @@ export function useWeather(params, options) {
   });
 }
 
-export function useRaceControl(params, options) {
+function useRaceControl(params, options) {
   return useQuery({
     queryKey: ["race_control", params],
     queryFn: () => openF1Api.raceControl(params),
@@ -149,7 +149,7 @@ export function useRaceControl(params, options) {
   });
 }
 
-export function useOvertakes(params, options) {
+function useOvertakes(params, options) {
   return useQuery({
     queryKey: ["overtakes", params],
     queryFn: () => openF1Api.overtakes(params),
@@ -159,7 +159,7 @@ export function useOvertakes(params, options) {
   });
 }
 
-export function useTeamsByYear(year) {
+function useTeamsByYear(year) {
   const { data: sessions = [] } = useSessions({ year, session_type: "Race" });
   const lastSessionKey = sessions.at(-1)?.session_key;
 
@@ -225,3 +225,22 @@ export function useTeamsByYear(year) {
 
   return { data, isLoading };
 }
+
+export {
+  useDrivers,
+  useDriversByYear,
+  useSessions,
+  useMeetings,
+  useLaps,
+  useChampionshipDrivers,
+  useChampionshipTeams,
+  useSessionResult,
+  useStartingGrid,
+  usePit,
+  useStints,
+  useCarData,
+  useWeather,
+  useRaceControl,
+  useOvertakes,
+  useTeamsByYear,
+};
