@@ -50,8 +50,11 @@ const columnDefs = [
     headerName: "Date",
     field: "date_start",
     sortable: true,
+    searchable: true,
     width: 130,
     valueFormatter: formatDate,
+    filter: "agTextColumnFilter",
+    filterValueGetter: ({ data }) => formatDate({ value: data?.date_start }),
   },
   {
     headerName: "Status",

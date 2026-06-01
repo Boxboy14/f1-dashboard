@@ -68,6 +68,7 @@ An F1 fan wants to dig into a specific race weekend. They click on a row in the 
 - **FR-007**: The Calendar tab MUST display a meaningful empty state if no race data is available for the selected season.
 - **FR-008**: Clicking a race row MUST navigate the user to the race detail page for that GP (navigates to the meeting detail route).
 - **FR-009**: The selected season MUST be preserved in the URL when navigating to a race detail page.
+- **FR-010**: The Date column MUST support free-text search filtering — typing a formatted date (e.g., `"14 Mar 2025"`) MUST filter rows to matching races. Calendar-picker style date filters are not acceptable.
 
 ### Key Entities
 
