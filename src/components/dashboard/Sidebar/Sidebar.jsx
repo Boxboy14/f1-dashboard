@@ -12,8 +12,8 @@ import styles from "./Sidebar.module.scss";
 const NAV_ITEMS = [
   { label: "Overview", icon: DashboardIcon, path: "/overview", disabled: true },
   { label: "Drivers", icon: UserIcon, path: "/drivers" },
-  { label: "Teams", icon: UserGroupIcon, path: "/teams", disabled: true },
-  { label: "Calendar", icon: CalendarIcon, path: "/seasons", disabled: true },
+  { label: "Teams", icon: UserGroupIcon, path: "/teams" },
+  { label: "Calendar", icon: CalendarIcon, path: "/seasons" },
   { label: "Sessions", icon: FlagIcon, path: "/sessions", disabled: true },
   { label: "Telemetry", icon: ChartLineIcon, path: "/telemetry", disabled: true },
 ];
