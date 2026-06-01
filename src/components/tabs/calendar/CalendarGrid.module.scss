@@ -15,3 +15,24 @@
   object-fit: contain;
   flex-shrink: 0;
 }
+
+.statusFilter {
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statusFilterOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  cursor: pointer;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-sm);
+
+  input[type="checkbox"] {
+    cursor: pointer;
+  }
+}
