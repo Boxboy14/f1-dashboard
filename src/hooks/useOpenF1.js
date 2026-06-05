@@ -226,6 +226,35 @@ function useTeamsByYear(year) {
   return { data, isLoading };
 }
 
+function useRaceCalendar(year) {
+  const { data: meetings = [], isLoading } = useMeetings({ year });
+
+  const data = useMemo(() => {
+    if (!meetings.length) return [];
+
+    return meetings
+      .filter((m) => !m.meeting_name.toLowerCase().includes("testing"))
+      .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))
+      .map((m, index) => ({
+        meeting_key: m.meeting_key,
+        round: index + 1,
+        meeting_name: m.meeting_name,
+        circuit_short_name: m.circuit_short_name,
+        country_name: m.country_name,
+        country_flag: m.country_flag,
+        date_start: m.date_start,
+        is_cancelled: m.is_cancelled,
+        status: m.is_cancelled
+          ? "Cancelled"
+          : new Date(m.date_start) < new Date()
+          ? "Completed"
+          : "Upcoming",
+      }));
+  }, [meetings]);
+
+  return { data, isLoading };
+}
+
 export {
   useDrivers,
   useDriversByYear,
@@ -243,4 +272,5 @@ export {
   useRaceControl,
   useOvertakes,
   useTeamsByYear,
+  useRaceCalendar,
 };

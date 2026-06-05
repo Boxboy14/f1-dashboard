@@ -2,6 +2,7 @@ import "./App.css";
 import { Navigate, Route, Routes } from "react-router-dom";
 import HomePage from "./components/dashboard/HomePage.jsx";
 import TeamsPage from "./components/dashboard/TeamsPage.jsx";
+import SeasonsPage from "./components/dashboard/SeasonsPage.jsx";
 import DashboardLayout from "./components/dashboard/layouts/DashboardLayout.jsx";
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Route path="drivers/:driverSlug" element={<HomePage />} />
         <Route path="teams" element={<TeamsPage />} />
         <Route path="teams/:teamSlug" element={<TeamsPage />} />
+        <Route path="seasons" element={<SeasonsPage />} />
       </Route>
     </Routes>
   );
