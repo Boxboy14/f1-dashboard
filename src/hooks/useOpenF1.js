@@ -226,6 +226,44 @@ function useTeamsByYear(year) {
   return { data, isLoading };
 }
 
+function useMeetingDetail(meetingKey) {
+  const { data: meetings = [], isLoading: isLoadingMeeting } = useMeetings(
+    { meeting_key: meetingKey },
+    { enabled: Boolean(meetingKey) }
+  );
+
+  const { data: rawSessions = [], isLoading: isLoadingSessions } = useSessions(
+    { meeting_key: meetingKey },
+    { enabled: Boolean(meetingKey) }
+  );
+
+  const sessions = useMemo(() => {
+    if (!rawSessions.length) return [];
+    const now = new Date();
+    return [...rawSessions]
+      .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))
+      .map((s) => {
+        const start = s.date_start ? new Date(s.date_start) : null;
+        const end = s.date_end ? new Date(s.date_end) : null;
+        let status = "Unknown";
+        if (start && end) {
+          if (end < now) status = "Completed";
+          else if (start <= now) status = "In Progress";
+          else status = "Upcoming";
+        } else if (start) {
+          status = start < now ? "Completed" : "Upcoming";
+        }
+        return { ...s, status };
+      });
+  }, [rawSessions]);
+
+  return {
+    meeting: meetings[0] ?? null,
+    sessions,
+    isLoading: Boolean(meetingKey) && (isLoadingMeeting || isLoadingSessions),
+  };
+}
+
 function useRaceCalendar(year) {
   const { data: meetings = [], isLoading } = useMeetings({ year });
 
@@ -273,4 +311,5 @@ export {
   useOvertakes,
   useTeamsByYear,
   useRaceCalendar,
+  useMeetingDetail,
 };
