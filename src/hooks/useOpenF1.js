@@ -239,10 +239,12 @@ function useMeetingDetail(meetingKey) {
 
   const sessions = useMemo(() => {
     if (!rawSessions.length) return [];
+    const isCancelled = meetings[0]?.is_cancelled;
     const now = new Date();
     return [...rawSessions]
       .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))
       .map((s) => {
+        if (isCancelled) return { ...s, status: "Cancelled" };
         const start = s.date_start ? new Date(s.date_start) : null;
         const end = s.date_end ? new Date(s.date_end) : null;
         let status = "Unknown";
@@ -255,7 +257,7 @@ function useMeetingDetail(meetingKey) {
         }
         return { ...s, status };
       });
-  }, [rawSessions]);
+  }, [rawSessions, meetings]);
 
   return {
     meeting: meetings[0] ?? null,
