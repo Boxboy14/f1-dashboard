@@ -1,17 +1,7 @@
 import DataGrid from "../../DataGrid.jsx";
 import { useTeamsByYear } from "../../../hooks/useOpenF1.js";
-import TEAM_LOGO_MAP from "../../../constants/teamLogos.js";
+import TeamCellRenderer from "../../../utils/cellRenderers/TeamCellRenderer.jsx";
 import styles from "./TeamsGrid.module.scss";
-
-const TeamCellRenderer = ({ value, data }) => {
-  const logoUrl = TEAM_LOGO_MAP[data?.team_name];
-  return (
-    <span className={styles.teamCell}>
-      {value}
-      {logoUrl && <img src={logoUrl} alt="" className={styles.teamLogo} />}
-    </span>
-  );
-};
 
 const columnDefs = [
   { headerName: "Rank", field: "position_current", sortable: true, width: 80 },

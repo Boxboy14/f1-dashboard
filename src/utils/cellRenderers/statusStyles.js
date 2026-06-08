@@ -4,6 +4,10 @@ const STATUS_STYLES = {
   Upcoming: { color: "#22c55e" },
   Cancelled: { color: "var(--salt-status-error-foreground)" },
   Unknown: { color: "var(--salt-content-secondary-foreground)" },
+  Finished: { color: "var(--salt-content-secondary-foreground)" },
+  DNF: { color: "var(--salt-status-error-foreground)" },
+  DNS: { color: "var(--salt-status-error-foreground)" },
+  DSQ: { color: "var(--salt-status-error-foreground)" },
 };
 
 export { STATUS_STYLES };
