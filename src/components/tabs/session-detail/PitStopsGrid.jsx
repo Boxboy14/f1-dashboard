@@ -40,7 +40,6 @@ const columnDefs = [
     field: "full_name",
     flex: 1,
     sortable: false,
-    filter: false,
     cellRenderer: DriverGroupCellRenderer,
   },
   {
@@ -48,7 +47,6 @@ const columnDefs = [
     field: "team_name",
     width: 200,
     sortable: false,
-    filter: false,
     cellRenderer: TeamColumnRenderer,
   },
   {
