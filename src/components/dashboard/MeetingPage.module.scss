@@ -1,0 +1,11 @@
+.countryRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.countryFlag {
+  height: 20px;
+  width: auto;
+  object-fit: contain;
+}

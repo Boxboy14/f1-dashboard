@@ -226,6 +226,136 @@ function useTeamsByYear(year) {
   return { data, isLoading };
 }
 
+function useMeetingDetail(meetingKey) {
+  const { data: meetings = [], isLoading: isLoadingMeeting } = useMeetings(
+    { meeting_key: meetingKey },
+    { enabled: Boolean(meetingKey) }
+  );
+
+  const { data: rawSessions = [], isLoading: isLoadingSessions } = useSessions(
+    { meeting_key: meetingKey },
+    { enabled: Boolean(meetingKey) }
+  );
+
+  const sessions = useMemo(() => {
+    if (!rawSessions.length) return [];
+    const isCancelled = meetings[0]?.is_cancelled;
+    const now = new Date();
+    return [...rawSessions]
+      .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))
+      .map((s) => {
+        if (isCancelled) return { ...s, status: "Cancelled" };
+        const start = s.date_start ? new Date(s.date_start) : null;
+        const end = s.date_end ? new Date(s.date_end) : null;
+        let status = "Unknown";
+        if (start && end) {
+          if (end < now) status = "Completed";
+          else if (start <= now) status = "In Progress";
+          else status = "Upcoming";
+        } else if (start) {
+          status = start < now ? "Completed" : "Upcoming";
+        }
+        return { ...s, status };
+      });
+  }, [rawSessions, meetings]);
+
+  return {
+    meeting: meetings[0] ?? null,
+    sessions,
+    isLoading: Boolean(meetingKey) && (isLoadingMeeting || isLoadingSessions),
+  };
+}
+
+function useSessionDetail(sessionKey) {
+  const { data: sessions = [], isLoading: isLoadingSessions } = useSessions(
+    { session_key: sessionKey },
+    { enabled: Boolean(sessionKey) }
+  );
+
+  const { data: rawResults = [], isLoading: isLoadingResults } = useSessionResult(
+    { session_key: sessionKey },
+    { enabled: Boolean(sessionKey) }
+  );
+
+  const { data: drivers = [], isLoading: isLoadingDrivers } = useDrivers(
+    { session_key: sessionKey },
+    { enabled: Boolean(sessionKey) }
+  );
+
+  const { data: rawPitStops = [], isLoading: isLoadingPit } = usePit(
+    { session_key: sessionKey },
+    { enabled: Boolean(sessionKey) }
+  );
+
+  const { results, pitStops } = useMemo(() => {
+    const driverMap = new Map(
+      drivers.map((d) => [
+        d.driver_number,
+        {
+          full_name: d.full_name ?? String(d.driver_number),
+          name_acronym: d.name_acronym,
+          team_name: d.team_name ?? "—",
+          team_colour: d.team_colour,
+        },
+      ])
+    );
+
+    const sessionType = sessions[0]?.session_type ?? "";
+    const isRaceType = ["Race", "Sprint"].includes(sessionType);
+    const isQualifyingType = sessionType.includes("Qualifying");
+
+    const enrichedResults = [...rawResults]
+      .sort((a, b) => a.position - b.position)
+      .map((r) => {
+        const driver = driverMap.get(r.driver_number) ?? {};
+        const status = r.dsq ? "DSQ" : r.dnf ? "DNF" : r.dns ? "DNS" : "Finished";
+        let best_time = null;
+        if (!isRaceType) {
+          if (isQualifyingType && Array.isArray(r.duration)) {
+            const times = r.duration.filter((t) => t != null);
+            best_time = times.at(-1) ?? null;
+          } else if (!isQualifyingType) {
+            best_time = r.duration ?? null;
+          }
+        }
+        return {
+          ...r,
+          full_name: driver.full_name ?? String(r.driver_number),
+          name_acronym: driver.name_acronym,
+          team_name: driver.team_name ?? "—",
+          team_colour: driver.team_colour,
+          status,
+          best_time,
+        };
+      });
+
+    const enrichedPitStops = [...rawPitStops]
+      .sort(
+        (a, b) =>
+          a.lap_number - b.lap_number || new Date(a.date) - new Date(b.date)
+      )
+      .map((p) => {
+        const driver = driverMap.get(p.driver_number) ?? {};
+        return {
+          ...p,
+          full_name: driver.full_name ?? String(p.driver_number),
+          team_name: driver.team_name ?? "—",
+        };
+      });
+
+    return { results: enrichedResults, pitStops: enrichedPitStops };
+  }, [rawResults, drivers, rawPitStops, sessions]);
+
+  return {
+    session: sessions[0] ?? null,
+    results,
+    pitStops,
+    isLoading:
+      Boolean(sessionKey) &&
+      (isLoadingSessions || isLoadingResults || isLoadingDrivers || isLoadingPit),
+  };
+}
+
 function useRaceCalendar(year) {
   const { data: meetings = [], isLoading } = useMeetings({ year });
 
@@ -273,4 +403,6 @@ export {
   useOvertakes,
   useTeamsByYear,
   useRaceCalendar,
+  useMeetingDetail,
+  useSessionDetail,
 };
