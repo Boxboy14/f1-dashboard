@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { openF1Api } from "../services/api/openf1.js";
 import { COUNTRY_CODE_MAP } from "../constants/countryMap.js";
+import { deriveSessionStatus, deriveMeetingStatus } from "../utils/sessionStatus.js";
 
 function transformDrivers(data) {
   if (!data) return [];
@@ -240,23 +241,9 @@ function useMeetingDetail(meetingKey) {
   const sessions = useMemo(() => {
     if (!rawSessions.length) return [];
     const isCancelled = meetings[0]?.is_cancelled;
-    const now = new Date();
     return [...rawSessions]
       .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))
-      .map((s) => {
-        if (isCancelled) return { ...s, status: "Cancelled" };
-        const start = s.date_start ? new Date(s.date_start) : null;
-        const end = s.date_end ? new Date(s.date_end) : null;
-        let status = "Unknown";
-        if (start && end) {
-          if (end < now) status = "Completed";
-          else if (start <= now) status = "In Progress";
-          else status = "Upcoming";
-        } else if (start) {
-          status = start < now ? "Completed" : "Upcoming";
-        }
-        return { ...s, status };
-      });
+      .map((s) => ({ ...s, status: deriveSessionStatus(s, isCancelled) }));
   }, [rawSessions, meetings]);
 
   return {
@@ -385,6 +372,156 @@ function useRaceCalendar(year) {
   return { data, isLoading };
 }
 
+function useSeasonGrandPrix(year) {
+  const { data: meetings = [], isLoading: isLoadingMeetings } = useMeetings({
+    year,
+  });
+  const { data: rawSessions = [], isLoading: isLoadingSessions } = useSessions({
+    year,
+  });
+
+  const grandPrix = useMemo(() => {
+    if (!meetings.length) return [];
+
+    const sessionsByMeeting = new Map();
+    for (const s of rawSessions) {
+      const list = sessionsByMeeting.get(s.meeting_key) ?? [];
+      list.push(s);
+      sessionsByMeeting.set(s.meeting_key, list);
+    }
+
+    return meetings
+      .filter((m) => !m.meeting_name.toLowerCase().includes("testing"))
+      .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))
+      .map((m, index) => {
+        const group = (sessionsByMeeting.get(m.meeting_key) ?? [])
+          .slice()
+          .sort((a, b) => new Date(a.date_start) - new Date(b.date_start));
+
+        const sessions = group.map((s) => ({
+          session_key: s.session_key,
+          session_name: s.session_name,
+          session_type: s.session_type,
+          date_start: s.date_start,
+          status: deriveSessionStatus(s, m.is_cancelled),
+        }));
+
+        const ends = group
+          .map((s) => s.date_end)
+          .filter(Boolean)
+          .sort((a, b) => new Date(a) - new Date(b));
+
+        return {
+          meeting_key: m.meeting_key,
+          round: index + 1,
+          meeting_name: m.meeting_name,
+          country_name: m.country_name,
+          country_flag: m.country_flag,
+          circuit_short_name: m.circuit_short_name,
+          date_start: group[0]?.date_start ?? m.date_start,
+          date_end: ends.at(-1) ?? null,
+          status: deriveMeetingStatus(sessions, m.is_cancelled),
+          sessions,
+        };
+      });
+  }, [meetings, rawSessions]);
+
+  return { grandPrix, isLoading: isLoadingMeetings || isLoadingSessions };
+}
+
+function useSeasonKpis(year) {
+  const { data: sessions = [], isLoading: isLoadingSessions } = useSessions({
+    year,
+  });
+  const { data: meetings = [] } = useMeetings({ year });
+
+  const { lastRaceKey, lastRaceMeetingKey, nextRaceSession } = useMemo(() => {
+    const now = new Date();
+    const races = sessions
+      .filter((s) => s.session_type === "Race")
+      .slice()
+      .sort((a, b) => new Date(a.date_start) - new Date(b.date_start));
+    const isPast = (s) =>
+      s.date_end ? new Date(s.date_end) < now : new Date(s.date_start) < now;
+    const lastRace = races.filter(isPast).at(-1) ?? null;
+    const nextRace = races.find((s) => new Date(s.date_start) > now) ?? null;
+    return {
+      lastRaceKey: lastRace?.session_key ?? null,
+      lastRaceMeetingKey: lastRace?.meeting_key ?? null,
+      nextRaceSession: nextRace,
+    };
+  }, [sessions]);
+
+  const enabled = { enabled: Boolean(lastRaceKey) };
+  const { data: driverStandings = [], isLoading: isLoadingStandings } =
+    useChampionshipDrivers({ session_key: lastRaceKey }, enabled);
+  const { data: drivers = [], isLoading: isLoadingDrivers } = useDrivers(
+    { session_key: lastRaceKey },
+    enabled
+  );
+  const { data: results = [], isLoading: isLoadingResults } = useSessionResult(
+    { session_key: lastRaceKey },
+    enabled
+  );
+
+  const kpis = useMemo(() => {
+    const driverMap = new Map(drivers.map((d) => [d.driver_number, d]));
+
+    const topDriver = [...driverStandings].sort(
+      (a, b) => a.position_current - b.position_current
+    )[0];
+    const leader = topDriver
+      ? {
+          full_name:
+            driverMap.get(topDriver.driver_number)?.full_name ??
+            String(topDriver.driver_number),
+          team_name: driverMap.get(topDriver.driver_number)?.team_name ?? "—",
+          points: topDriver.points_current,
+          position: topDriver.position_current,
+        }
+      : null;
+
+    const winnerResult = results.find((r) => r.position === 1);
+    const lastWinner = winnerResult
+      ? {
+          full_name:
+            driverMap.get(winnerResult.driver_number)?.full_name ??
+            String(winnerResult.driver_number),
+          team_name:
+            driverMap.get(winnerResult.driver_number)?.team_name ?? "—",
+          meeting_name:
+            meetings.find((m) => m.meeting_key === lastRaceMeetingKey)
+              ?.meeting_name ?? "—",
+        }
+      : null;
+
+    let nextRace = null;
+    if (nextRaceSession) {
+      const meeting = meetings.find(
+        (m) => m.meeting_key === nextRaceSession.meeting_key
+      );
+      const msUntil =
+        new Date(nextRaceSession.date_start).getTime() - new Date().getTime();
+      nextRace = {
+        meeting_name: meeting?.meeting_name ?? "—",
+        country_flag: meeting?.country_flag ?? null,
+        date_start: nextRaceSession.date_start,
+        daysUntil: Math.max(0, Math.ceil(msUntil / 86_400_000)),
+      };
+    }
+
+    return { leader, lastWinner, nextRace };
+  }, [driverStandings, drivers, results, meetings, lastRaceMeetingKey, nextRaceSession]);
+
+  return {
+    kpis,
+    isLoading:
+      isLoadingSessions ||
+      (Boolean(lastRaceKey) &&
+        (isLoadingStandings || isLoadingDrivers || isLoadingResults)),
+  };
+}
+
 export {
   useDrivers,
   useDriversByYear,
@@ -405,4 +542,6 @@ export {
   useRaceCalendar,
   useMeetingDetail,
   useSessionDetail,
+  useSeasonGrandPrix,
+  useSeasonKpis,
 };

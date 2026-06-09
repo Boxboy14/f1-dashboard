@@ -1,0 +1,19 @@
+.card {
+  flex: 1 1 200px;
+}
+
+.label {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--salt-content-secondary-foreground);
+}
+
+.primary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.secondary {
+  font-size: 13px;
+}

@@ -1,0 +1,63 @@
+.card {
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.round {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--salt-content-secondary-foreground);
+}
+
+.name {
+  font-size: 15px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flag {
+  height: 18px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.subheader {
+  font-size: 13px;
+}
+
+.sessions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.sessionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  border-top: 1px solid var(--salt-separable-tertiary-borderColor);
+}
+
+.sessionName {
+  font-size: 13px;
+}
