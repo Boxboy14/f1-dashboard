@@ -153,7 +153,8 @@ This is the working plan for the F1 Dashboard. Claude Code refers to this when g
 | State split | TanStack Query owns server/async state. Redux is for client-only UI state that survives navigation. URL owns navigation state. |
 | Styling | SCSS Modules. No inline styles except for genuinely dynamic values. |
 | UI components | **Salt DS first.** Raw HTML only when Salt has no equivalent. See CLAUDE.md Rule 4. |
-| Rate limits | OpenF1 free = 3 req/sec, 30 req/min. Every `useQuery` must declare `staleTime`. |
+| Rate limits | OpenF1 free = 3 req/sec, 30 req/min. Every `useQuery` must declare `staleTime`. All fetches pass through the queue in `src/services/api/rateLimiter.js`, which paces them to ≤3/sec and ≤30/min so bursts never 429. |
+| Cache persistence | Successful queries are persisted to `localStorage` (`src/services/cache/persistQueryCache.js`) and restored before first render — historical data is immutable, so reloads paint from cache. |
 | Routing | React Router 7. URL state, not Redux, drives navigation. |
 | Component isolation | Each page is a self-contained folder: component, hook, styles. |
 

@@ -1,3 +1,5 @@
+import { schedule } from "./rateLimiter.js";
+
 const BASE_URL = "https://api.openf1.org/v1";
 
 function buildUrl(endpoint, params = {}) {
@@ -12,7 +14,7 @@ function buildUrl(endpoint, params = {}) {
 
 async function fetchOpenF1(endpoint, params = {}) {
   const url = buildUrl(endpoint, params);
-  const response = await fetch(url);
+  const response = await schedule(() => fetch(url));
   if (!response.ok) {
     throw new Error(`OpenF1 API error: ${response.status} ${response.statusText}`);
   }

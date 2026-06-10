@@ -421,7 +421,8 @@ function useSeasonGrandPrix(year) {
           date_start: group[0]?.date_start ?? m.date_start,
           date_end: ends.at(-1) ?? null,
           status: deriveMeetingStatus(sessions, m.is_cancelled),
-          sessions,
+          raceSessionKey:
+            group.find((s) => s.session_type === "Race")?.session_key ?? null,
         };
       });
   }, [meetings, rawSessions]);

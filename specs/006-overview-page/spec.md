@@ -14,19 +14,19 @@ The Overview page is the landing dashboard for a selected season. It answers two
 
 ### User Story 1 - See every Grand Prix and its sessions as cards (Priority: P1)
 
-A fan opens the Overview page for the selected season and sees a card for every Grand Prix of that year. Each card lays out the most important information about that Grand Prix — its round number, name, host country (with flag), circuit, weekend dates, and overall status (completed, upcoming, in progress, or cancelled) — and lists the sessions that make up that weekend (e.g. Practice 1–3, Qualifying, Sprint, Race) each with its own status.
+A fan opens the Overview page for the selected season and sees a card for every Grand Prix of that year. Each card lays out the most important information about that Grand Prix — its round number, name, host country (with flag), circuit, weekend dates, and overall status (completed, upcoming, in progress, or cancelled) — the **top 3 finishers** of that Grand Prix's race, and a button that opens the full session list for the weekend.
 
-**Why this priority**: This is the literal heart of the request — "the overview of all sessions." Organising every session under its Grand Prix card lets a fan absorb the whole season's shape in one scroll. It delivers standalone value even without KPIs or navigation.
+**Why this priority**: This is the heart of the request — a season at a glance. Each card surfaces the headline outcome of a Grand Prix (who stood on the podium) and a one-click path into the full weekend's sessions. It delivers standalone value even without KPIs.
 
-**Independent Test**: Load `/overview` with a season selected. Confirm one card renders per Grand Prix in that year, each showing the GP's identity, weekend dates, status, and its list of sessions with per-session status. No KPIs or click-through required for this story to be useful.
+**Independent Test**: Load `/overview` with a season selected. Confirm one card renders per Grand Prix in that year, each showing the GP's identity, weekend dates, status, the race's top 3 finishers, and a "view all GP sessions" button. No KPIs required for this story to be useful.
 
 **Acceptance Scenarios**:
 
 1. **Given** the 2025 season is selected, **When** the Overview page loads, **Then** a card appears for each Grand Prix in 2025, ordered by round number.
-2. **Given** a Grand Prix has concluded, **When** its card renders, **Then** the card is marked as completed and lists each of its sessions marked completed.
-3. **Given** a Grand Prix is in the future, **When** its card renders, **Then** the card is marked upcoming and its sessions are marked upcoming.
-4. **Given** a Grand Prix weekend is in progress, **When** its card renders, **Then** completed sessions, the in-progress session, and upcoming sessions are each distinguishable.
-5. **Given** a Grand Prix was cancelled, **When** its card renders, **Then** the card is marked cancelled.
+2. **Given** a Grand Prix race has concluded, **When** its card renders, **Then** the card is marked completed and shows the top 3 finishers (position, driver, team) of that race.
+3. **Given** a Grand Prix is in the future, **When** its card renders, **Then** the card is marked upcoming and shows a placeholder instead of a podium.
+4. **Given** a Grand Prix was cancelled, **When** its card renders, **Then** the card is marked cancelled and shows a placeholder instead of a podium.
+5. **Given** any Grand Prix card, **When** it renders, **Then** it shows a "Click here to view all GP sessions" button and the Grand Prix name is not a link.
 
 ---
 
@@ -48,18 +48,18 @@ Above the Grand Prix cards, the fan sees a small set of season KPI cards summari
 
 ---
 
-### User Story 3 - Drill into a meeting or session from a card (Priority: P3)
+### User Story 3 - View all sessions of a Grand Prix from a card (Priority: P3)
 
-From any Grand Prix card, the fan can jump straight into detail: selecting the Grand Prix opens that meeting's page, and selecting an individual session on the card opens that session's detail page.
+From any Grand Prix card, the fan can open that weekend's full session list by clicking the "view all GP sessions" button, which opens the Grand Prix's meeting page (where the session grid lives).
 
 **Why this priority**: The cards become an index into the rest of the app. This is an enhancement on top of the read-only overview — valuable, but the overview informs even without it.
 
-**Independent Test**: From a GP card, activate the Grand Prix and confirm navigation to `/meetings/:key`. Activate a session on the card and confirm navigation to `/sessions/:key`. Confirm the selected season is preserved across navigation.
+**Independent Test**: From a GP card, click the "view all GP sessions" button and confirm navigation to `/meetings/:key`. Confirm the selected season is preserved across navigation.
 
 **Acceptance Scenarios**:
 
-1. **Given** a Grand Prix card, **When** the fan selects the Grand Prix, **Then** they are taken to that meeting's detail page.
-2. **Given** a Grand Prix card listing sessions, **When** the fan selects a session, **Then** they are taken to that session's detail page.
+1. **Given** a Grand Prix card, **When** the fan clicks "Click here to view all GP sessions", **Then** they are taken to that Grand Prix's meeting page (the full session list).
+2. **Given** the Grand Prix name on the card, **When** the fan tries to click it, **Then** nothing happens — it is not interactive.
 3. **Given** the fan navigates away and back, **When** they return to the Overview, **Then** the same season remains selected.
 
 ---
@@ -80,10 +80,10 @@ From any Grand Prix card, the fan can jump straight into detail: selecting the G
 - **FR-001**: The Overview page MUST be scoped to the season selected in the navbar year selector, and MUST update when the selected year changes.
 - **FR-002**: The page MUST display one Grand Prix card for every Grand Prix in the selected season, ordered by round number.
 - **FR-003**: Each Grand Prix card MUST show the round number, Grand Prix name, host country name and flag, circuit, the weekend date (or date range), and an overall status of completed, upcoming, in progress, or cancelled.
-- **FR-004**: Each Grand Prix card MUST list the sessions belonging to that Grand Prix in chronological order, each with its session name/type and an individual status.
+- **FR-004**: Each Grand Prix card MUST show the top 3 finishers (podium) of that Grand Prix's race — finishing position, driver name, and team — and MUST provide a button ("Click here to view all GP sessions") that navigates to the full session list for that Grand Prix. When the race result is unavailable (not yet raced, cancelled, or data restricted), the card MUST show a non-error placeholder in place of the podium.
 - **FR-005**: The page MUST display a season KPI strip above the Grand Prix cards showing, at minimum: the driver championship leader (name, team, points), the most recent completed race winner (driver and Grand Prix), and the next upcoming race (Grand Prix and date).
 - **FR-006**: When the season has no upcoming races, the next-race KPI MUST show a "season complete" state; when no races have completed, leader/winner KPIs MUST show placeholder states without error.
-- **FR-007**: Selecting a Grand Prix on a card MUST navigate to that meeting's detail page; selecting a session on a card MUST navigate to that session's detail page.
+- **FR-007**: The card's "view all GP sessions" button MUST navigate to that Grand Prix's meeting page (the full session list). The Grand Prix name itself is presentational and MUST NOT be interactive — the button is the only interactive element on the card.
 - **FR-008**: Navigation originating from the Overview MUST preserve the selected season so the user returns to the same year context.
 - **FR-009**: The page MUST present a loading state while season data is being retrieved and MUST not show partial/janky content as data arrives.
 - **FR-010**: The page MUST present an empty state when the selected season has no Grand Prix/session data.
@@ -102,8 +102,8 @@ From any Grand Prix card, the fan can jump straight into detail: selecting the G
 
 - **SC-001**: From a cold load of the Overview page, a fan can identify the current championship leader and the next race within 5 seconds, without scrolling.
 - **SC-002**: Every Grand Prix in the selected season is represented by exactly one card — no missing and no duplicate Grand Prix.
-- **SC-003**: A fan can reach any individual session's detail page from the Overview in at most two interactions (open card context → select session), or directly in one where the session is listed on the card.
-- **SC-004**: A fan can correctly distinguish completed from upcoming Grand Prix at a glance, with 100% of cards showing a status indicator.
+- **SC-003**: A fan can reach a Grand Prix's full session list from the Overview in a single click (the card's "view all GP sessions" button).
+- **SC-004**: A fan can correctly distinguish completed from upcoming Grand Prix at a glance, with 100% of cards showing a status indicator; completed-race cards show a 3-driver podium.
 - **SC-005**: Switching the selected season updates the entire page (KPIs and all cards) to the new year with no stale data from the previous selection.
 - **SC-006**: The page renders a usable first view within standard web expectations (under ~3 seconds on a typical connection) and never shows a raw error screen for the known empty/locked data conditions.
 
@@ -114,5 +114,5 @@ From any Grand Prix card, the fan can jump straight into detail: selecting the G
 - **KPIs blended with cards**: the page combines the season-snapshot KPIs (the original plan.md vision for `/overview`) with the per-Grand-Prix session cards (this request).
 - **Reuses existing detail pages**: drill-down targets are the already-built meeting detail (`/meetings/:key`) and session detail (`/sessions/:key`) pages; this feature adds no new detail pages.
 - **Data source coverage**: season schedule, sessions, and championship standings come from the existing single data source (OpenF1), which covers 2023–2025; the page must stay within that source's rate limits by fetching season-level lists rather than per-item calls where avoidable.
-- **Per-card race winner is out of scope for the first cut**: the most-recent race winner appears in the KPI strip; showing each completed Grand Prix's winner on its own card is a possible later enhancement (it would require a result lookup per Grand Prix) and is not required by this spec.
+- **Per-card podium requires a result lookup per Grand Prix**: each card shows its race's top 3, which means one race-result query per completed Grand Prix (~24 for a full season). These are cached (5-min staleTime) and reuse a single season-wide driver-name map, but the first uncached load fans out roughly one call per GP — which approaches the OpenF1 free-tier rate limit (3 req/sec, 30 req/min). Accepted as a deliberate trade-off for the podium feature.
 - **Dark theme only**, consistent with the rest of the app.

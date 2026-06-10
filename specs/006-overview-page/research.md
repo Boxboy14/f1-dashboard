@@ -67,8 +67,12 @@ Phase 0 decisions. Each resolves an unknown or commits to an approach before des
 **Rationale**: Mirrors the established join pattern in `useTeamsByYear`/`useSessionDetail` (championship and result endpoints carry `driver_number`, not names). All six queries are season-level and cached; no per-GP fan-out (Article IV, rate limits).
 
 **Alternatives considered**:
-- *Per-GP result lookups to show each card's winner* — rejected for the first cut: up to 24 `session_result` calls would strain the 30 req/min limit. The KPI strip's single "last winner" covers the need; per-card winners are a documented future enhancement.
 - *`session_key=latest` for standings* — rejected: not year-scoped. The selected year's last completed race is the correct standings anchor.
+
+> **Update (post-implementation, per user request)**: each Grand Prix card now shows the **top 3 finishers** of its race, which *does* require a per-GP `session_result` lookup — reversing the "out of scope" stance above. The first naive version hit OpenF1's 30 req/min limit (24 parallel calls → 429s, blank podiums). Fixed with three layers:
+> 1. **App-wide rate limiter** (`src/services/api/rateLimiter.js`) — a queue in the fetch layer releasing requests at ≤3/sec and ≤30/min, so no burst (from any feature) ever 429s. Redux was considered and rejected: state-management choice doesn't change request volume, and would discard React Query's caching/dedup.
+> 2. **Lazy-loaded podiums** — `GrandPrixCard` fetches its result only once it scrolls into view (`useInView` / IntersectionObserver), and only for **completed** races, joined against **one** season-wide driver map (`useDriversByYear`, shared with the navbar — no extra call). Visible cards load first; off-screen cards never fetch until reached.
+> 3. **Persisted query cache** (`src/services/cache/persistQueryCache.js`) — successful queries are dehydrated to `localStorage` and restored before first render, so reloads/revisits paint instantly and re-issue near-zero requests (historical data is immutable; `gcTime` raised to 24h).
 
 **Known runtime reality**: With the current date (June 2026), all selectable seasons (2023–2025) are complete, so `nextRace` is almost always `null` → the next-race KPI shows "Season complete," and `lastRaceKey` is the year's final race. The placeholder/"season complete" states (FR-006) are therefore the common path and must be solid, not afterthoughts.
 

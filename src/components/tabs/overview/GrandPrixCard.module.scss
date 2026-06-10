@@ -1,4 +1,12 @@
+.cardWrap {
+  height: 100%;
+}
+
 .card {
+  height: 100%;
+}
+
+.stack {
   height: 100%;
 }
 
@@ -24,8 +32,6 @@
 }
 
 .name {
-  font-size: 15px;
-  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -42,22 +48,57 @@
   font-size: 13px;
 }
 
-.sessions {
+.podium {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   margin-top: 4px;
+  min-height: 84px;
 }
 
-.sessionRow {
+.podiumRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
-  padding: 4px 0;
-  border-top: 1px solid var(--salt-separable-tertiary-borderColor);
 }
 
-.sessionName {
+.pos {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.driver {
+  flex: 1;
+  min-width: 0;
   font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team {
+  flex-shrink: 0;
+  max-width: 45%;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.podiumNote {
+  font-size: 13px;
+}
+
+.viewButton {
+  width: 100%;
+  margin-top: auto;
 }

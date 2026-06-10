@@ -19,18 +19,33 @@ One per Grand Prix in the selected season. Produced by `useSeasonGrandPrix(year)
 | `date_start` | ISO string | derived | Min `session.date_start` across the GP's sessions (weekend start) |
 | `date_end` | ISO string \| null | derived | Max `session.date_end` across the GP's sessions (weekend end) |
 | `status` | StatusEnum | `deriveMeetingStatus()` | Rolled up from session statuses + `is_cancelled` |
-| `sessions` | `SessionSummary[]` | derived | Sorted by `date_start` ascending |
+| `raceSessionKey` | number \| null | derived | `session_key` of the GP's `Race` session; drives the per-card podium lookup |
 
 **Validation / rules**:
 - Meetings whose `meeting_name` contains "testing" are excluded (same filter as `useRaceCalendar`).
-- A GP with zero sessions still renders (identity + status from the meeting), with an empty session list.
+- A GP with zero sessions still renders (identity + status from the meeting); `raceSessionKey` is `null` and the podium shows a placeholder.
 - `round` is positional, not from the API (OpenF1 has no round field).
+- The session list is no longer part of the card model — the card shows a podium + a button to the meeting page instead (the full session grid lives on the meeting page).
 
 ---
 
-## Entity: `SessionSummary`
+## Entity: `RacePodium` (per card)
 
-One per session within a Grand Prix card.
+Fetched inside `GrandPrixCard` via `useSessionResult({ session_key: raceSessionKey })`, enabled only when the GP status is `Completed`. The top 3 by finishing position, name/team joined from the season-wide driver map passed down from `OverviewPage`.
+
+| Field | Type | Source | Notes |
+|---|---|---|---|
+| `position` | number | `session_result.position` | 1–3 only |
+| `full_name` | string | `drivers.full_name` (joined) | Falls back to `#<driver_number>` if absent from the season map |
+| `team_name` | string | `drivers.team_name` (joined) | |
+
+Empty when the race result is unavailable (upcoming, cancelled, or data-restricted) → card shows a placeholder.
+
+---
+
+## Entity: `SessionSummary` (internal)
+
+One per session within a Grand Prix. Used **internally** by `useSeasonGrandPrix` to derive the GP's rolled-up status and to locate the `Race` session (`raceSessionKey`); it is no longer rendered on the card.
 
 | Field | Type | Source | Notes |
 |---|---|---|---|
