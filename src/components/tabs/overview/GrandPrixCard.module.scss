@@ -26,7 +26,7 @@
 
 .round {
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--salt-content-secondary-foreground);
 }
@@ -98,7 +98,8 @@
   font-size: 13px;
 }
 
-.viewButton {
-  width: 100%;
+.viewLink {
   margin-top: auto;
+  align-self: flex-end;
+  font-size: 15px;
 }

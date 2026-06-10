@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Button, Card, StackLayout, Text } from "@salt-ds/core";
+import { Card, Link, StackLayout, Text } from "@salt-ds/core";
 import StatusPill from "./StatusPill.jsx";
 import { useSessionResult } from "../../../hooks/useOpenF1.js";
 import useInView from "../../../hooks/useInView.js";
@@ -16,7 +16,7 @@ const GrandPrixCard = ({ gp, driversByNumber, onOpenMeeting }) => {
     {
       enabled:
         inView && gp.status === "Completed" && Boolean(gp.raceSessionKey),
-    }
+    },
   );
 
   const podium = useMemo(
@@ -32,7 +32,7 @@ const GrandPrixCard = ({ gp, driversByNumber, onOpenMeeting }) => {
             team_name: driver?.team_name ?? "",
           };
         }),
-    [results, driversByNumber]
+    [results, driversByNumber],
   );
 
   const showPlaceholder = !inView || isLoading;
@@ -44,7 +44,7 @@ const GrandPrixCard = ({ gp, driversByNumber, onOpenMeeting }) => {
           <div className={styles.header}>
             <span className={styles.title}>
               <span className={styles.round}>R{gp.round}</span>
-              <Text styleAs="h4" className={styles.name}>
+              <Text styleAs="h2" className={styles.name}>
                 {gp.meeting_name}
               </Text>
               {gp.country_flag && (
@@ -55,7 +55,8 @@ const GrandPrixCard = ({ gp, driversByNumber, onOpenMeeting }) => {
           </div>
 
           <Text color="secondary" className={styles.subheader}>
-            {gp.circuit_short_name} · {formatWeekend(gp.date_start, gp.date_end)}
+            {gp.circuit_short_name} ·{" "}
+            {formatWeekend(gp.date_start, gp.date_end)}
           </Text>
 
           <div className={styles.podium}>
@@ -85,13 +86,20 @@ const GrandPrixCard = ({ gp, driversByNumber, onOpenMeeting }) => {
             )}
           </div>
 
-          <Button
-            variant="cta"
-            className={styles.viewButton}
-            onClick={() => onOpenMeeting(gp.meeting_key)}
+          <Link
+            href={`/meetings/${gp.meeting_key}`}
+            onClick={(event) => {
+              event.preventDefault();
+              onOpenMeeting(gp.meeting_key);
+            }}
+            className={styles.viewLink}
+            style={{
+              color: "var(--salt-color-blue-300)",
+              textDecoration: "none",
+            }}
           >
-            Click here to view all GP sessions
-          </Button>
+            Click to view all sessions
+          </Link>
         </StackLayout>
       </Card>
     </div>
