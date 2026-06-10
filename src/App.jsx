@@ -5,6 +5,7 @@ import TeamsPage from "./components/dashboard/TeamsPage.jsx";
 import SeasonsPage from "./components/dashboard/SeasonsPage.jsx";
 import MeetingPage from "./components/dashboard/MeetingPage.jsx";
 import SessionDetailPage from "./components/dashboard/SessionDetailPage.jsx";
+import OverviewPage from "./components/dashboard/OverviewPage.jsx";
 import DashboardLayout from "./components/dashboard/layouts/DashboardLayout.jsx";
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
     <Routes>
       <Route path="/" element={<DashboardLayout />}>
         <Route index element={<Navigate to="/drivers" replace />} />
+        <Route path="overview" element={<OverviewPage />} />
         <Route path="drivers" element={<HomePage />} />
         <Route path="drivers/:driverSlug" element={<HomePage />} />
         <Route path="teams" element={<TeamsPage />} />

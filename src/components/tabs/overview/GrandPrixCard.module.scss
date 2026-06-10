@@ -1,0 +1,105 @@
+.cardWrap {
+  height: 100%;
+}
+
+.card {
+  height: 100%;
+}
+
+.stack {
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.round {
+  flex-shrink: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--salt-content-secondary-foreground);
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flag {
+  height: 18px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.subheader {
+  font-size: 13px;
+}
+
+.podium {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+  min-height: 84px;
+}
+
+.podiumRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pos {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.driver {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team {
+  flex-shrink: 0;
+  max-width: 45%;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.podiumNote {
+  font-size: 13px;
+}
+
+.viewLink {
+  margin-top: auto;
+  align-self: flex-end;
+  font-size: 15px;
+}

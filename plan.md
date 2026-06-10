@@ -53,10 +53,11 @@ This is the working plan for the F1 Dashboard. Claude Code refers to this when g
 
 ### Planned
 
-**`/overview` — Season snapshot (P1 after Teams)**
-- KPI cards: current championship leader (driver + team), last race winner, next GP countdown.
-- Top 5 drivers + top 5 teams mini tables.
-- Last race result summary card.
+**`/overview` — Season dashboard (BUILT)**
+- Year-scoped to the navbar year selector.
+- Season KPI strip: championship leader (driver + team + points), last race winner, next race (or "Season complete").
+- Grand Prix cards: one Salt `Card` per GP — round, name, country + flag, circuit, weekend dates, status, and the GP's session list. GP name → meeting page; each session → session detail.
+- See `specs/006-overview-page/`.
 
 **`/teams` — Constructor standings (P1, next)**
 - Team cards with both drivers, team color, current points, championship rank.
@@ -117,12 +118,15 @@ This is the working plan for the F1 Dashboard. Claude Code refers to this when g
 - `.specify/memory/constitution.md` ratified.
 - Speckit installed (`/speckit-*` commands available).
 
+**Done (continued):**
+- `/teams` + `/teams/:slug` (constructor standings + detail).
+- `/seasons` calendar grid → `/meetings/:key` (GP weekend) → `/sessions/:key` (session classification + pit stops).
+- `/overview` season dashboard (KPI strip + Grand Prix session cards) — `specs/006-overview-page/`.
+- Shared `src/utils/sessionStatus.js` status helper (used by the meeting page and overview cards).
+
 **Pending in Phase 1:**
 - Refactor Sidebar to use Salt DS components (`NavigationItem`, `StackLayout`) instead of raw `<aside>`, `<nav>`, `<NavLink>` (Rule 4 in CLAUDE.md).
-- Build `/teams` (next feature, via Speckit workflow).
-- Build `/seasons` + `/seasons/:year`.
-- Build `/meetings/:key` + `/sessions/:key`.
-- Build `/overview`.
+- Decide what the disabled `/sessions` sidebar entry should show (standalone recent-sessions list) or remove it.
 
 ### Phase 2 — Visualizations
 - Add Recharts.
@@ -149,7 +153,8 @@ This is the working plan for the F1 Dashboard. Claude Code refers to this when g
 | State split | TanStack Query owns server/async state. Redux is for client-only UI state that survives navigation. URL owns navigation state. |
 | Styling | SCSS Modules. No inline styles except for genuinely dynamic values. |
 | UI components | **Salt DS first.** Raw HTML only when Salt has no equivalent. See CLAUDE.md Rule 4. |
-| Rate limits | OpenF1 free = 3 req/sec, 30 req/min. Every `useQuery` must declare `staleTime`. |
+| Rate limits | OpenF1 free = 3 req/sec, 30 req/min. Every `useQuery` must declare `staleTime`. All fetches pass through the queue in `src/services/api/rateLimiter.js`, which paces them to ≤3/sec and ≤30/min so bursts never 429. |
+| Cache persistence | Successful queries are persisted to `localStorage` (`src/services/cache/persistQueryCache.js`) and restored before first render — historical data is immutable, so reloads paint from cache. |
 | Routing | React Router 7. URL state, not Redux, drives navigation. |
 | Component isolation | Each page is a self-contained folder: component, hook, styles. |
 
@@ -207,18 +212,13 @@ Constitution: `.specify/memory/constitution.md` (Articles I–VII).
 
 ## 8. Current State Snapshot
 
-**Branch:** `main`
+**Branch:** `feature-overview-tab`
 
-**Latest commits (in order, oldest → newest):**
-1. router config
-2. driver card setup
-3. driver card ready
-4. search driver opens driver card
-5. route to drivers/drivername
+**Built so far:** Drivers, Teams, Calendar → Meeting → Session detail, and the Overview season dashboard. All via the Speckit workflow (`specs/001`–`006`).
 
 **Immediate next actions (in order):**
-1. Refactor `src/components/dashboard/Sidebar/Sidebar.jsx` to Salt DS components (replaces raw `<aside>`/`<nav>`/`<NavLink>`).
-2. `/speckit-specify` the Teams page → plan → tasks → implement.
-3. `/speckit-specify` the Seasons + Meetings + Sessions flow.
+1. Refactor `src/components/dashboard/Sidebar/Sidebar.jsx` to Salt DS components (replaces raw `<aside>`/`<nav>`/`<NavLink>`) — last Phase 1 cleanup.
+2. Begin Phase 2 visualizations (Recharts already installed): lap-time chart on the session detail page, then tire-strategy timeline.
+3. Resolve the disabled `/sessions` sidebar entry (define a standalone sessions view or remove it).
 
 When in doubt about what to build next, follow this list top-down.

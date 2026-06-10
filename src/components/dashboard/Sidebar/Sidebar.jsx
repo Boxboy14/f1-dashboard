@@ -10,7 +10,7 @@ import {
 import styles from "./Sidebar.module.scss";
 
 const NAV_ITEMS = [
-  { label: "Overview", icon: DashboardIcon, path: "/overview", disabled: true },
+  { label: "Overview", icon: DashboardIcon, path: "/overview" },
   { label: "Drivers", icon: UserIcon, path: "/drivers" },
   { label: "Teams", icon: UserGroupIcon, path: "/teams" },
   { label: "Calendar", icon: CalendarIcon, path: "/seasons" },
