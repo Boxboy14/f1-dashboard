@@ -6,6 +6,7 @@ import SeasonsPage from "./components/dashboard/SeasonsPage.jsx";
 import MeetingPage from "./components/dashboard/MeetingPage.jsx";
 import SessionDetailPage from "./components/dashboard/SessionDetailPage.jsx";
 import OverviewPage from "./components/dashboard/OverviewPage.jsx";
+import TelemetryPage from "./components/dashboard/TelemetryPage.jsx";
 import DashboardLayout from "./components/dashboard/layouts/DashboardLayout.jsx";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Route path="seasons" element={<SeasonsPage />} />
         <Route path="meetings/:meetingKey" element={<MeetingPage />} />
         <Route path="sessions/:sessionKey" element={<SessionDetailPage />} />
+        <Route path="telemetry" element={<TelemetryPage />} />
       </Route>
     </Routes>
   );

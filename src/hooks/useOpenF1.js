@@ -3,6 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { openF1Api } from "../services/api/openf1.js";
 import { COUNTRY_CODE_MAP } from "../constants/countryMap.js";
 import { deriveSessionStatus, deriveMeetingStatus } from "../utils/sessionStatus.js";
+import {
+  deriveDistance,
+  resampleToGrid,
+  mergeDrivers,
+} from "../utils/telemetry.js";
 
 function transformDrivers(data) {
   if (!data) return [];
@@ -126,6 +131,21 @@ function useCarData(params, options) {
     queryFn: () => openF1Api.carData(params),
     staleTime: 5 * 60 * 1000,
     enabled: Boolean(params?.session_key && params?.driver_number),
+    ...options,
+  });
+}
+
+function useCarDataLap(params, options) {
+  return useQuery({
+    queryKey: ["car_data_lap", params],
+    queryFn: () => openF1Api.carDataLap(params),
+    staleTime: 30 * 60 * 1000,
+    enabled: Boolean(
+      params?.session_key &&
+        params?.driver_number &&
+        params?.date_gte &&
+        params?.date_lt
+    ),
     ...options,
   });
 }
@@ -523,6 +543,121 @@ function useSeasonKpis(year) {
   };
 }
 
+const TELEMETRY_GRID_POINTS = 400;
+
+// One driver's fastest-lap telemetry: find the fastest valid lap, then fetch
+// only that lap's car_data window (dependent fetch).
+function useDriverLapTelemetry(sessionKey, driverNumber) {
+  const { data: laps = [], isLoading: lapsLoading } = useLaps(
+    { session_key: sessionKey, driver_number: driverNumber },
+    { enabled: Boolean(sessionKey && driverNumber) }
+  );
+
+  const fastest = useMemo(() => {
+    const valid = laps.filter(
+      (l) => l.lap_duration != null && !l.is_pit_out_lap
+    );
+    if (!valid.length) return null;
+    return valid.reduce((a, b) => (b.lap_duration < a.lap_duration ? b : a));
+  }, [laps]);
+
+  const dateLt = fastest
+    ? new Date(
+        new Date(fastest.date_start).getTime() + fastest.lap_duration * 1000
+      ).toISOString()
+    : null;
+
+  const { data: samples = [], isLoading: carLoading } = useCarDataLap({
+    session_key: sessionKey,
+    driver_number: driverNumber,
+    date_gte: fastest?.date_start ?? null,
+    date_lt: dateLt,
+  });
+
+  return {
+    fastest,
+    samples,
+    isLoading:
+      Boolean(driverNumber) && (lapsLoading || (Boolean(fastest) && carLoading)),
+  };
+}
+
+function useTelemetryComparison(sessionKey, driverNumbers = []) {
+  const slotA = driverNumbers[0] ?? null;
+  const slotB = driverNumbers[1] ?? null;
+
+  // Two fixed slots → constant hook count whether 1 or 2 drivers are selected.
+  const a = useDriverLapTelemetry(sessionKey, slotA);
+  const b = useDriverLapTelemetry(sessionKey, slotB);
+
+  const { data: drivers = [] } = useDrivers(
+    { session_key: sessionKey },
+    { enabled: Boolean(sessionKey) }
+  );
+
+  const { chartData, telemetryDrivers, statusBySlot } = useMemo(() => {
+    const driverMap = new Map(drivers.map((d) => [d.driver_number, d]));
+    const slots = [
+      { driverNumber: slotA, ...a },
+      { driverNumber: slotB, ...b },
+    ];
+
+    const grids = [null, null];
+    const meta = [];
+    const status = [];
+
+    slots.forEach((slot, i) => {
+      if (!slot.driverNumber) {
+        status.push("empty");
+        return;
+      }
+      const d = driverMap.get(slot.driverNumber);
+      const base = {
+        driver_number: slot.driverNumber,
+        name: d?.full_name ?? `#${slot.driverNumber}`,
+        slot: i,
+        suffix: i === 0 ? "a" : "b",
+        lapTime: slot.fastest?.lap_duration ?? null,
+        topSpeed: null,
+      };
+      if (!slot.fastest) {
+        status.push("no-lap");
+        meta.push({ ...base, status: "no-lap" });
+        return;
+      }
+      if (!slot.samples.length) {
+        status.push("no-telemetry");
+        meta.push({ ...base, status: "no-telemetry" });
+        return;
+      }
+      grids[i] = resampleToGrid(
+        deriveDistance(slot.samples),
+        TELEMETRY_GRID_POINTS
+      );
+      status.push("ok");
+      meta.push({
+        ...base,
+        topSpeed: Math.max(...slot.samples.map((s) => s.speed)),
+        status: "ok",
+      });
+    });
+
+    return {
+      chartData:
+        grids[0] || grids[1] ? mergeDrivers(grids[0], grids[1]) : [],
+      telemetryDrivers: meta,
+      statusBySlot: status,
+    };
+  }, [slotA, slotB, a, b, drivers]);
+
+  return {
+    chartData,
+    drivers: telemetryDrivers,
+    statusBySlot,
+    isLoading: a.isLoading || b.isLoading,
+  };
+}
+
 export {
   useDrivers,
   useDriversByYear,
@@ -536,6 +671,7 @@ export {
   usePit,
   useStints,
   useCarData,
+  useCarDataLap,
   useWeather,
   useRaceControl,
   useOvertakes,
@@ -545,4 +681,5 @@ export {
   useSessionDetail,
   useSeasonGrandPrix,
   useSeasonKpis,
+  useTelemetryComparison,
 };

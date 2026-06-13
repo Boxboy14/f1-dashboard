@@ -1,0 +1,21 @@
+.charts {
+  margin-top: 16px;
+}
+
+.legend {
+  margin-bottom: 4px;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}

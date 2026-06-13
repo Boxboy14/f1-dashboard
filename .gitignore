@@ -35,3 +35,6 @@ CLAUDE.md
 *.sln
 *.sw?
 
+# Performance documentation
+overview-perf-explained.txt
+
