@@ -1,4 +1,10 @@
-import { Dropdown, FlexLayout, FormField, FormFieldLabel, Option } from "@salt-ds/core";
+import {
+  Dropdown,
+  FormField,
+  FormFieldLabel,
+  GridLayout,
+  Option,
+} from "@salt-ds/core";
 import styles from "./TelemetryControls.module.scss";
 
 const labelFor = (options) => (value) =>
@@ -27,10 +33,11 @@ const TelemetryControls = ({
   const lapLabel = labelFor(laps);
 
   return (
-    <FlexLayout gap={2} className={styles.controls} wrap>
-      <FormField className={styles.field}>
+    <GridLayout columns={{ xs: 1, sm: 2 }} gap={2} className={styles.controls}>
+      <FormField>
         <FormFieldLabel>Select Event</FormFieldLabel>
         <Dropdown
+          className={styles.dropdown}
           placeholder="Select Event"
           disabled={!events.length}
           selected={meetingKey != null ? [String(meetingKey)] : []}
@@ -48,9 +55,10 @@ const TelemetryControls = ({
         </Dropdown>
       </FormField>
 
-      <FormField className={styles.field}>
+      <FormField>
         <FormFieldLabel>Select Session</FormFieldLabel>
         <Dropdown
+          className={styles.dropdown}
           placeholder="Select Session"
           disabled={!sessions.length}
           selected={sessionKey != null ? [String(sessionKey)] : []}
@@ -68,9 +76,10 @@ const TelemetryControls = ({
         </Dropdown>
       </FormField>
 
-      <FormField className={styles.field}>
+      <FormField>
         <FormFieldLabel>Select Drivers (max 2)</FormFieldLabel>
         <Dropdown
+          className={styles.dropdown}
           multiselect
           placeholder="Select Drivers"
           disabled={!drivers.length}
@@ -93,9 +102,10 @@ const TelemetryControls = ({
         </Dropdown>
       </FormField>
 
-      <FormField className={styles.field}>
+      <FormField>
         <FormFieldLabel>Select Lap</FormFieldLabel>
         <Dropdown
+          className={styles.dropdown}
           placeholder="Select Lap"
           disabled={!laps.length}
           selected={lapSelected ? [lapSelected] : []}
@@ -112,7 +122,7 @@ const TelemetryControls = ({
           ))}
         </Dropdown>
       </FormField>
-    </FlexLayout>
+    </GridLayout>
   );
 };
 

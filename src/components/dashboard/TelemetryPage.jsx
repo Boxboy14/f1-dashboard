@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { CircularProgress, Text } from "@salt-ds/core";
 import {
@@ -12,6 +12,19 @@ import DriverSummary from "../tabs/telemetry/DriverSummary.jsx";
 import TelemetryCharts from "../tabs/telemetry/TelemetryCharts.jsx";
 import styles from "./TelemetryPage.module.scss";
 
+// Selections persist for the session (survive refresh + tab navigation), keyed
+// by year so they only restore for the matching season. sessionStorage clears
+// when the tab/app closes — exactly when we want the telemetry forgotten.
+const STORAGE_KEY = "telemetry-selection";
+const readStored = (year) => {
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "null");
+    return parsed && parsed.year === year ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
 // Keyed by year: changing the navbar season remounts the view, which resets
 // every selection (dropdowns + charts) to the start — the React-idiomatic reset.
 const TelemetryPage = () => {
@@ -20,10 +33,29 @@ const TelemetryPage = () => {
 };
 
 const TelemetryView = ({ year }) => {
-  const [meetingKey, setMeetingKey] = useState(null);
-  const [sessionKey, setSessionKey] = useState(null);
-  const [driverNumbers, setDriverNumbers] = useState([]);
-  const [lapNumber, setLapNumber] = useState(null); // null = fastest lap
+  const [meetingKey, setMeetingKey] = useState(
+    () => readStored(year)?.meetingKey ?? null
+  );
+  const [sessionKey, setSessionKey] = useState(
+    () => readStored(year)?.sessionKey ?? null
+  );
+  const [driverNumbers, setDriverNumbers] = useState(
+    () => readStored(year)?.driverNumbers ?? []
+  );
+  const [lapNumber, setLapNumber] = useState(
+    () => readStored(year)?.lapNumber ?? null
+  ); // null = fastest lap
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ year, meetingKey, sessionKey, driverNumbers, lapNumber })
+      );
+    } catch {
+      /* sessionStorage unavailable — selections just won't persist */
+    }
+  }, [year, meetingKey, sessionKey, driverNumbers, lapNumber]);
 
   const { data: meetings = [] } = useRaceCalendar(year);
   const { data: sessions = [] } = useSessions(

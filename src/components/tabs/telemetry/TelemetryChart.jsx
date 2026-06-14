@@ -7,43 +7,48 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
-import { Text } from "@salt-ds/core";
 import { DRIVER_COLORS } from "./channels.js";
 import styles from "./TelemetryChart.module.scss";
 
 const AXIS = "#8b8f97";
 const GRID = "#2a2a2a";
+const LABEL = "#cbd5e1";
 
 const TelemetryChart = ({ channel, data, drivers, lapLabel }) => {
   const lines = drivers.filter((d) => d.status === "ok");
   const type = channel.lineType === "step" ? "stepAfter" : "monotone";
+  const axisTitle = channel.unit
+    ? `${channel.label} (${channel.unit})`
+    : channel.label;
 
   return (
     <div className={styles.chart}>
-      <Text styleAs="label" className={styles.title}>
-        {channel.label}
-        {channel.unit ? ` (${channel.unit})` : ""}
-      </Text>
-      <ResponsiveContainer width="100%" height={150}>
-        <LineChart
-          data={data}
-          syncId="telemetry"
-          margin={{ top: 4, right: 12, bottom: 0, left: 0 }}
-        >
+      <ResponsiveContainer width="100%" height={210}>
+        <LineChart data={data} syncId="telemetry" margin={{ top: 8, right: 16, bottom: 4, left: 8 }}>
           <CartesianGrid stroke={GRID} vertical={false} />
           <XAxis
             dataKey="distance"
             stroke={AXIS}
             tick={{ fontSize: 11, fill: AXIS }}
-            tickFormatter={(d) => `${d}`}
             unit="m"
           />
           <YAxis
             domain={channel.domain}
             stroke={AXIS}
             tick={{ fontSize: 11, fill: AXIS }}
-            width={44}
+            width={72}
             allowDecimals={false}
+            label={{
+              value: axisTitle,
+              angle: -90,
+              position: "insideLeft",
+              style: {
+                textAnchor: "middle",
+                fill: LABEL,
+                fontSize: 12,
+                fontWeight: 600,
+              },
+            }}
           />
           <Tooltip
             contentStyle={{

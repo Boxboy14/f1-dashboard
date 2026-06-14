@@ -632,6 +632,9 @@ function useTelemetryComparison(sessionKey, driverNumbers = [], lapNumber = null
       const base = {
         driver_number: slot.driverNumber,
         name: d?.full_name ?? `#${slot.driverNumber}`,
+        team_name: d?.team_name ?? "",
+        headshot_url: d?.headshot_url ?? null,
+        team_colour: d?.team_colour ?? null,
         slot: i,
         suffix: i === 0 ? "a" : "b",
         lapTime: slot.lap?.lap_duration ?? null,
