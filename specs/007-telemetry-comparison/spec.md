@@ -23,7 +23,8 @@ A fan opens the Telemetry page, picks a Grand Prix and a session, then selects a
 **Acceptance Scenarios**:
 
 1. **Given** an event, session, and one driver are selected, **When** the data loads, **Then** one chart per telemetry channel renders that driver's fastest-lap trace plotted against lap distance.
-2. **Given** a session, **When** the driver's lap is chosen, **Then** it is the driver's fastest valid lap of the entire session (lowest lap time, excluding in/out laps).
+2. **Given** a session with no lap chosen, **When** the data loads, **Then** the charts default to the driver's fastest valid lap (lowest lap time, excluding in/out laps).
+2a. **Given** the Lap selector, **When** the user picks a specific lap number, **Then** the charts re-render for that lap; picking "Fastest lap" returns to the default.
 3. **Given** the selections are incomplete (no event, session, or driver), **When** the page is shown, **Then** no charts are drawn and the user is prompted to complete the selection.
 4. **Given** a driver who set no timed lap in the session, **When** that driver is selected, **Then** a clear "no timed lap" message is shown instead of empty charts.
 
@@ -75,12 +76,13 @@ The fan hovers over any chart at a point on the lap; all charts indicate that sa
 ### Functional Requirements
 
 - **FR-001**: The page MUST be a standalone destination reachable from the sidebar (the currently-disabled Telemetry item), year-scoped to the navbar season selector.
-- **FR-002**: The page MUST present three selectors: **Event** (Grand Prix), **Session**, and **Drivers**, populated in that order.
+- **FR-002**: The page MUST present four selectors: **Event** (Grand Prix), **Session**, **Drivers**, and **Lap**, populated in that order.
 - **FR-003**: The Event selector MUST list every Grand Prix of the selected season (excluding pre-season testing).
 - **FR-004**: The Session selector MUST list all sessions for the chosen event (e.g. Practice 1–3, Qualifying, Sprint, Sprint Qualifying, Race, as applicable).
 - **FR-005**: The Drivers selector MUST list the drivers present in the chosen session and MUST allow selecting a **maximum of two** (any two, regardless of team).
 - **FR-006**: Telemetry MUST be retrieved and charts drawn only once an event, a session, and at least one driver are selected.
-- **FR-007**: For each selected driver, the page MUST use only that driver's **fastest valid lap of the session** (lowest lap time, excluding in/out laps).
+- **FR-007**: The page MUST default to each driver's **fastest valid lap of the session** (lowest lap time, excluding in/out laps), and MUST provide a **Lap selector** offering "Fastest lap" plus the individual lap numbers so the user can compare a specific lap instead.
+- **FR-015**: The selected lap MUST be a single shared lap **number** applied to both drivers (e.g. "Lap 30" = each driver's lap 30); the Lap selector's options MUST be the union of the selected drivers' timed laps; if a chosen lap number does not exist for one driver (e.g. they retired earlier), that driver MUST degrade to its per-driver "no data" state while the other still renders.
 - **FR-008**: The page MUST display one chart per available telemetry channel: **speed, throttle, brake, gear, engine RPM, and DRS**.
 - **FR-009**: All charts MUST plot against **distance into the lap** (derived consistently for every driver) and MUST share the same distance basis so corners align across drivers and across charts.
 - **FR-010**: With one driver selected, each chart MUST show a single trace; with two drivers, each chart MUST overlay both as visually distinct, legend-identified traces.
@@ -94,14 +96,15 @@ The fan hovers over any chart at a point on the lap; all charts indicate that sa
 - 3-sector "who's fastest" coloring and the minisector speed heatmap (explicitly future).
 - The circuit track map / position overlay.
 - A between-driver time-delta channel.
-- Comparing arbitrary laps (only the fastest lap of the session is shown) and comparing more than two drivers.
+- Comparing two *different* laps (the Lap selector applies one shared lap number to both drivers) and comparing more than two drivers.
 
 ### Key Entities *(include if feature involves data)*
 
 - **Event**: a Grand Prix in the selected season (round, name) — the first selector.
 - **Session**: an on-track session within the event (Practice / Qualifying / Sprint / Race) — the second selector.
 - **Driver selection**: up to two drivers chosen from the session's grid.
-- **Fastest lap**: per driver, the session's lowest-time valid lap; the basis for all charts and headline figures.
+- **Lap selection**: a single shared choice — "Fastest" (default) or a specific lap number — applied to both drivers; options are the union of the drivers' timed laps.
+- **Selected lap**: per driver, the lap matching the Lap selection (fastest, or the chosen number); the basis for all charts and headline figures.
 - **Telemetry channel**: one measured quantity along the lap — speed, throttle, brake, gear, RPM, DRS.
 - **Telemetry sample**: a point along the lap carrying the channel values, positioned by **distance into the lap**.
 
@@ -121,7 +124,8 @@ The fan hovers over any chart at a point on the lap; all charts indicate that sa
 - **Standalone page, own selectors**: telemetry lives at its own sidebar destination (not nested inside a session page), because the page carries its own Event and Session pickers — consistent with the flow the user described.
 - **Year from the navbar**: the Event list is scoped to the season chosen in the existing navbar selector, like Calendar/Overview/Teams.
 - **"All available metrics"** means the six telemetry channels the data source exposes per sample: speed, throttle, brake, gear, RPM, DRS.
-- **"All telemetry for a single driver"** means all six channels for that driver's fastest lap — the fastest-lap rule always applies; it does not mean every lap of the session.
+- **"All telemetry for a single driver"** means all six channels for the selected lap (fastest by default) — it does not mean every lap of the session at once.
+- **Lap selection is a single shared lap number** for both drivers. Comparing two *different* laps for two drivers is intentionally not offered — it isn't a meaningful comparison.
 - **Distance is derived** from the telemetry (speed over time) for the x-axis, per the agreed comparison basis; this is the standard way to align laps of different durations.
 - **Comparison is overlay-only** in this version — metric traces side by side. A time-delta channel, sector coloring, and the track map are deliberate future phases.
 - **Two-driver hard cap**: more than two drivers is out of scope for this version.

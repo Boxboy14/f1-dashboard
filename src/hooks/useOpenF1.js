@@ -547,53 +547,70 @@ const TELEMETRY_GRID_POINTS = 400;
 
 // One driver's fastest-lap telemetry: find the fastest valid lap, then fetch
 // only that lap's car_data window (dependent fetch).
-function useDriverLapTelemetry(sessionKey, driverNumber) {
+function useDriverLapTelemetry(sessionKey, driverNumber, lapNumber) {
   const { data: laps = [], isLoading: lapsLoading } = useLaps(
     { session_key: sessionKey, driver_number: driverNumber },
     { enabled: Boolean(sessionKey && driverNumber) }
   );
 
-  const fastest = useMemo(() => {
+  // lapNumber === null → fastest valid lap; otherwise the requested lap.
+  const lap = useMemo(() => {
     const valid = laps.filter(
       (l) => l.lap_duration != null && !l.is_pit_out_lap
     );
     if (!valid.length) return null;
-    return valid.reduce((a, b) => (b.lap_duration < a.lap_duration ? b : a));
-  }, [laps]);
+    if (lapNumber == null) {
+      return valid.reduce((a, b) => (b.lap_duration < a.lap_duration ? b : a));
+    }
+    return valid.find((l) => l.lap_number === lapNumber) ?? null;
+  }, [laps, lapNumber]);
 
-  const dateLt = fastest
+  const dateLt = lap
     ? new Date(
-        new Date(fastest.date_start).getTime() + fastest.lap_duration * 1000
+        new Date(lap.date_start).getTime() + lap.lap_duration * 1000
       ).toISOString()
     : null;
 
   const { data: samples = [], isLoading: carLoading } = useCarDataLap({
     session_key: sessionKey,
     driver_number: driverNumber,
-    date_gte: fastest?.date_start ?? null,
+    date_gte: lap?.date_start ?? null,
     date_lt: dateLt,
   });
 
   return {
-    fastest,
+    lap,
+    laps,
     samples,
     isLoading:
-      Boolean(driverNumber) && (lapsLoading || (Boolean(fastest) && carLoading)),
+      Boolean(driverNumber) && (lapsLoading || (Boolean(lap) && carLoading)),
   };
 }
 
-function useTelemetryComparison(sessionKey, driverNumbers = []) {
+function useTelemetryComparison(sessionKey, driverNumbers = [], lapNumber = null) {
   const slotA = driverNumbers[0] ?? null;
   const slotB = driverNumbers[1] ?? null;
 
   // Two fixed slots → constant hook count whether 1 or 2 drivers are selected.
-  const a = useDriverLapTelemetry(sessionKey, slotA);
-  const b = useDriverLapTelemetry(sessionKey, slotB);
+  const a = useDriverLapTelemetry(sessionKey, slotA, lapNumber);
+  const b = useDriverLapTelemetry(sessionKey, slotB, lapNumber);
 
   const { data: drivers = [] } = useDrivers(
     { session_key: sessionKey },
     { enabled: Boolean(sessionKey) }
   );
+
+  // Union of both drivers' selectable (timed, non-out) lap numbers, for the
+  // shared Lap dropdown.
+  const lapNumbers = useMemo(() => {
+    const set = new Set();
+    for (const list of [a.laps, b.laps]) {
+      for (const l of list ?? []) {
+        if (l.lap_duration != null && !l.is_pit_out_lap) set.add(l.lap_number);
+      }
+    }
+    return [...set].sort((x, y) => x - y);
+  }, [a.laps, b.laps]);
 
   const { chartData, telemetryDrivers, statusBySlot } = useMemo(() => {
     const driverMap = new Map(drivers.map((d) => [d.driver_number, d]));
@@ -617,10 +634,10 @@ function useTelemetryComparison(sessionKey, driverNumbers = []) {
         name: d?.full_name ?? `#${slot.driverNumber}`,
         slot: i,
         suffix: i === 0 ? "a" : "b",
-        lapTime: slot.fastest?.lap_duration ?? null,
+        lapTime: slot.lap?.lap_duration ?? null,
         topSpeed: null,
       };
-      if (!slot.fastest) {
+      if (!slot.lap) {
         status.push("no-lap");
         meta.push({ ...base, status: "no-lap" });
         return;
@@ -654,6 +671,7 @@ function useTelemetryComparison(sessionKey, driverNumbers = []) {
     chartData,
     drivers: telemetryDrivers,
     statusBySlot,
+    lapNumbers,
     isLoading: a.isLoading || b.isLoading,
   };
 }

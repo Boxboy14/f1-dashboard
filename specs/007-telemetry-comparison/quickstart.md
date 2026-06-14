@@ -50,6 +50,17 @@ Manual browser verification. Run after implementation. `npm run dev`, open **Tel
 
 ---
 
+## Scenario 5b — Lap selection (FR-007 · FR-015)
+
+1. With a session and one or two drivers selected, open the **Lap** dropdown.
+2. **Expect**: "Fastest lap" (default) plus numbered laps (the union of the drivers' timed laps).
+3. Pick a specific lap → charts re-render for that lap; both drivers show their own lap of that number; pick "Fastest lap" → back to default.
+4. With two drivers where one ran fewer laps, pick a high lap number → the short driver shows "no data," the other still renders.
+
+✅ Pass: lap is selectable, shared across both drivers, with graceful per-driver fallback.
+
+---
+
 ## Scenario 6 — Session types (FR-004)
 
 1. Switch Session to **Qualifying**, then **Practice 3**.

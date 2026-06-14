@@ -55,6 +55,8 @@ const decodeDrs = (v) => (v === 10 || v === 12 || v === 14 ? 1 : 0);
 // Either grid may be null (single driver, or one driver had no valid lap) —
 // only the present driver's columns are written. Both grids share the same
 // point count, so index i is the same fraction of each lap (aligned corners).
+const round2 = (n) => Math.round(n * 100) / 100;
+
 const mergeDrivers = (gridA, gridB) => {
   const base = gridA ?? gridB;
   if (!base) return [];
@@ -63,19 +65,19 @@ const mergeDrivers = (gridA, gridB) => {
     const b = gridB?.[i];
     const row = { distance: Math.round((a ?? b).distance) };
     if (a) {
-      row.speed_a = a.speed;
-      row.throttle_a = a.throttle;
-      row.brake_a = a.brake;
+      row.speed_a = round2(a.speed);
+      row.throttle_a = round2(a.throttle);
+      row.brake_a = round2(a.brake);
       row.gear_a = a.n_gear;
-      row.rpm_a = a.rpm;
+      row.rpm_a = round2(a.rpm);
       row.drs_a = decodeDrs(a.drs);
     }
     if (b) {
-      row.speed_b = b.speed;
-      row.throttle_b = b.throttle;
-      row.brake_b = b.brake;
+      row.speed_b = round2(b.speed);
+      row.throttle_b = round2(b.throttle);
+      row.brake_b = round2(b.brake);
       row.gear_b = b.n_gear;
-      row.rpm_b = b.rpm;
+      row.rpm_b = round2(b.rpm);
       row.drs_b = decodeDrs(b.drs);
     }
     return row;

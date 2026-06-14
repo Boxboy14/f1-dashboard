@@ -23,6 +23,7 @@ const TelemetryView = ({ year }) => {
   const [meetingKey, setMeetingKey] = useState(null);
   const [sessionKey, setSessionKey] = useState(null);
   const [driverNumbers, setDriverNumbers] = useState([]);
+  const [lapNumber, setLapNumber] = useState(null); // null = fastest lap
 
   const { data: meetings = [] } = useRaceCalendar(year);
   const { data: sessions = [] } = useSessions(
@@ -58,18 +59,42 @@ const TelemetryView = ({ year }) => {
     setMeetingKey(value);
     setSessionKey(null);
     setDriverNumbers([]);
+    setLapNumber(null);
   }, []);
   const onSessionChange = useCallback((value) => {
     setSessionKey(value);
     setDriverNumbers([]);
+    setLapNumber(null);
   }, []);
   const onDriversChange = useCallback((value) => setDriverNumbers(value), []);
+  const onLapChange = useCallback(
+    (value) => setLapNumber(value === "fastest" ? null : Number(value)),
+    []
+  );
 
   const {
     chartData,
     drivers: telemetryDrivers,
+    lapNumbers,
     isLoading,
-  } = useTelemetryComparison(sessionKey, driverNumbers);
+  } = useTelemetryComparison(sessionKey, driverNumbers, lapNumber);
+
+  const lapOptions = useMemo(
+    () =>
+      lapNumbers.length
+        ? [
+            { value: "fastest", label: "Fastest lap" },
+            ...lapNumbers.map((n) => ({ value: n, label: `Lap ${n}` })),
+          ]
+        : [],
+    [lapNumbers]
+  );
+  const lapSelected = lapOptions.length
+    ? lapNumber == null
+      ? "fastest"
+      : String(lapNumber)
+    : "";
+  const lapLabel = lapNumber == null ? "Fastest lap" : `Lap ${lapNumber}`;
 
   const ready = Boolean(sessionKey && driverNumbers.length);
   const hasData = chartData.length > 0;
@@ -81,12 +106,15 @@ const TelemetryView = ({ year }) => {
         events={eventOptions}
         sessions={sessionOptions}
         drivers={driverOptions}
+        laps={lapOptions}
         meetingKey={meetingKey}
         sessionKey={sessionKey}
         driverNumbers={driverNumbers}
+        lapSelected={lapSelected}
         onEventChange={onEventChange}
         onSessionChange={onSessionChange}
         onDriversChange={onDriversChange}
+        onLapChange={onLapChange}
       />
 
       {!ready ? (
@@ -99,7 +127,11 @@ const TelemetryView = ({ year }) => {
         <>
           <DriverSummary drivers={telemetryDrivers} />
           {hasData ? (
-            <TelemetryCharts chartData={chartData} drivers={telemetryDrivers} />
+            <TelemetryCharts
+              chartData={chartData}
+              drivers={telemetryDrivers}
+              lapLabel={lapLabel}
+            />
           ) : (
             <Text color="secondary" className={styles.message}>
               No telemetry available for this selection.

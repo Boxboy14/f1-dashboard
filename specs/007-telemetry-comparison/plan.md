@@ -93,8 +93,8 @@ src/
 
 ### Selection state (in `TelemetryPage`)
 
-- `year` from `useOutletContext()` (navbar). Local state: `meetingKey`, `sessionKey`, `driverNumbers` (array, ≤2).
-- Cascade resets: changing **year** clears all; changing **event** clears session + drivers; changing **session** clears drivers (drivers are session-specific).
+- `year` from `useOutletContext()` (navbar). Local state: `meetingKey`, `sessionKey`, `driverNumbers` (array, ≤2), `lapNumber` (`null` = fastest).
+- Cascade resets: changing **year** remounts the view (key) so all clears; changing **event** clears session + drivers + lap; changing **session** clears drivers + lap. Changing drivers keeps the lap (per-driver status covers a lap a driver doesn't have).
 - (Local component state, not URL — simplest correct MVP; URL-shareable selection is a noted future enhancement.)
 
 ### Selector data (reused hooks)
@@ -105,10 +105,12 @@ src/
 
 ### Telemetry composition (`useTelemetryComparison(sessionKey, driverNumbers)`)
 
-Two **fixed slots** (A = `driverNumbers[0]`, B = `driverNumbers[1]`) so hook count is constant regardless of 1 vs 2 drivers. Per slot, gated by `enabled`:
+Signature: `useTelemetryComparison(sessionKey, driverNumbers, lapNumber)`. Two **fixed slots** (A = `driverNumbers[0]`, B = `driverNumbers[1]`) so hook count is constant regardless of 1 vs 2 drivers. Per slot, gated by `enabled`:
 
-1. `useLaps({ session_key, driver_number })` → **fastest valid lap** (min `lap_duration`, excluding `is_pit_out_lap` and null durations) → `date_start`, `lap_duration`.
+1. `useLaps({ session_key, driver_number })` → the **selected lap**: when `lapNumber` is `null`, the fastest valid lap (min `lap_duration`, excluding `is_pit_out_lap`); otherwise the lap with that `lap_number`.
 2. `useCarDataLap({ session_key, driver_number, date_gte: lap.date_start, date_lt: lap.date_start + lap_duration })` → ~300 telemetry samples for just that lap (enabled once the lap is known).
+
+The hook also returns `lapNumbers` — the union of both drivers' timed lap numbers — for the Lap dropdown.
 
 Then a `useMemo` pipeline (pure `utils/telemetry.js`):
 1. `deriveDistance(samples)` per driver — cumulative ∫ speed·dt.
@@ -120,7 +122,7 @@ Returns `{ chartData, drivers, isLoading, statusBySlot }` where `statusBySlot` d
 
 ### Rendering
 
-- **`TelemetryControls`** — three Salt `Dropdown`s wrapped in `FormField`/`FormFieldLabel`. Drivers dropdown is `multiselect` with controlled `selected`; the `onSelectionChange` handler **caps at 2** (ignores a 3rd pick). Each dropdown disabled until its prerequisite is chosen.
+- **`TelemetryControls`** — four Salt `Dropdown`s wrapped in `FormField`/`FormFieldLabel`: Event, Session, Drivers, Lap. Each is fully controlled via `selected` + `value` (button text) + `onSelectionChange`. Drivers is `multiselect` and **caps at 2** (ignores a 3rd pick). Lap offers "Fastest lap" + numbered laps (the `"fastest"` sentinel maps to `lapNumber = null`). Each dropdown is disabled until its prerequisite is chosen.
 - **`DriverSummary`** — a color-coded chip/card per selected driver: name (in the driver's color), fastest lap time (`m:ss.mmm`), top speed.
 - **`TelemetryCharts`** — maps the `CHANNELS` config to a vertical stack of `TelemetryChart`s (vertical stack so all share the distance x-axis and read like a telemetry trace stack). One shared legend (driver A/B chips) at the top.
 - **`TelemetryChart`** — a Recharts `ResponsiveContainer`>`LineChart` with `syncId="telemetry"` (links the hover cursor across all six → US3), `XAxis dataKey="distance"`, a channel-specific `YAxis`, subtle `CartesianGrid`, `Tooltip`, and one `Line` per present driver (`<channel>_a` / `<channel>_b`) in the driver colors. Brake/gear/DRS render as stepped lines; speed/throttle/rpm as plain lines. No heavy animation/gradients ("clean, not glittery").

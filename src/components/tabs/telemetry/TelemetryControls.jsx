@@ -11,16 +11,20 @@ const TelemetryControls = ({
   events,
   sessions,
   drivers,
+  laps,
   meetingKey,
   sessionKey,
   driverNumbers,
+  lapSelected,
   onEventChange,
   onSessionChange,
   onDriversChange,
+  onLapChange,
 }) => {
   const eventLabel = labelFor(events);
   const sessionLabel = labelFor(sessions);
   const driverLabel = labelFor(drivers);
+  const lapLabel = labelFor(laps);
 
   return (
     <FlexLayout gap={2} className={styles.controls} wrap>
@@ -82,6 +86,26 @@ const TelemetryControls = ({
           }}
         >
           {drivers.map((o) => (
+            <Option key={o.value} value={String(o.value)}>
+              {o.label}
+            </Option>
+          ))}
+        </Dropdown>
+      </FormField>
+
+      <FormField className={styles.field}>
+        <FormFieldLabel>Select Lap</FormFieldLabel>
+        <Dropdown
+          placeholder="Select Lap"
+          disabled={!laps.length}
+          selected={lapSelected ? [lapSelected] : []}
+          value={lapSelected ? lapLabel(lapSelected) : undefined}
+          valueToString={lapLabel}
+          onSelectionChange={(_, sel) => {
+            if (sel[0] != null) onLapChange(sel[0]);
+          }}
+        >
+          {laps.map((o) => (
             <Option key={o.value} value={String(o.value)}>
               {o.label}
             </Option>

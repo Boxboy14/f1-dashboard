@@ -91,6 +91,17 @@ No project-level setup required. Recharts 3.8 and Salt DS are already installed 
 
 ---
 
+## Phase 7: Lap selection (added post-implementation)
+
+**Goal**: A 4th "Lap" dropdown — "Fastest lap" (default) + numbered laps, one shared lap number for both drivers — so a specific lap can be compared, not only the fastest (spec FR-007 / FR-015).
+
+- [X] T018 In `src/hooks/useOpenF1.js`, give `useDriverLapTelemetry` a `lapNumber` arg (null → fastest, else the lap with that number), thread it through `useTelemetryComparison(sessionKey, driverNumbers, lapNumber)`, and return `lapNumbers` (union of both drivers' timed laps)
+- [X] T019 In `src/components/dashboard/TelemetryPage.jsx`, add `lapNumber` state + `onLapChange` (maps `"fastest"` → null) + cascade resets (event/session reset lap), build `lapOptions` from `lapNumbers`, pass to the hook and controls
+- [X] T020 In `src/components/tabs/telemetry/TelemetryControls.jsx`, add the controlled **Lap** `Dropdown` (disabled until laps exist)
+- [X] T021 Update spec.md (FR-002/FR-007/FR-015, US1, assumptions, scope, entities), plan.md, data-model.md, contracts/components.md for the lap selector
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

@@ -14,7 +14,7 @@ import styles from "./TelemetryChart.module.scss";
 const AXIS = "#8b8f97";
 const GRID = "#2a2a2a";
 
-const TelemetryChart = ({ channel, data, drivers }) => {
+const TelemetryChart = ({ channel, data, drivers, lapLabel }) => {
   const lines = drivers.filter((d) => d.status === "ok");
   const type = channel.lineType === "step" ? "stepAfter" : "monotone";
 
@@ -51,7 +51,7 @@ const TelemetryChart = ({ channel, data, drivers }) => {
               border: `1px solid ${GRID}`,
               borderRadius: 6,
             }}
-            labelFormatter={(d) => `${d} m`}
+            labelFormatter={(d) => `${lapLabel} · ${d} m`}
           />
           {lines.map((d) => (
             <Line

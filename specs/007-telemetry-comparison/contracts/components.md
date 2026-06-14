@@ -26,11 +26,12 @@ Props/return shapes and responsibilities each unit must honor.
 ## Hook: `useTelemetryComparison(sessionKey, driverNumbers)`
 
 **Location**: `src/hooks/useOpenF1.js`
-**Input**: `sessionKey: number|null`, `driverNumbers: number[]` (≤2)
-**Returns**: `{ chartData: ChartRow[], drivers: DriverMeta[], isLoading: boolean, statusBySlot: ("ok"|"no-lap"|"no-telemetry"|"empty")[] }`
+**Input**: `sessionKey: number|null`, `driverNumbers: number[]` (≤2), `lapNumber: number|null` (`null` = fastest)
+**Returns**: `{ chartData: ChartRow[], drivers: DriverMeta[], isLoading: boolean, statusBySlot: ("ok"|"no-lap"|"no-telemetry"|"empty")[], lapNumbers: number[] }`
 
 **Responsibilities**:
-- Two fixed slots (A=`driverNumbers[0]`, B=`driverNumbers[1]`). Per slot: `useLaps({session_key, driver_number})` (enabled when both present) → fastest valid lap; `useCarDataLap({...lap window})` (enabled when lap known).
+- Two fixed slots (A=`driverNumbers[0]`, B=`driverNumbers[1]`). Per slot: `useLaps({session_key, driver_number})` (enabled when both present) → the **selected lap** (fastest when `lapNumber` is null, else the lap with that number); `useCarDataLap({...lap window})` (enabled when lap known).
+- Expose `lapNumbers` = union of both drivers' timed (non-out) lap numbers, sorted — for the Lap dropdown.
 - `useMemo`: `deriveDistance` → `resampleToGrid` → `mergeDrivers`; build `DriverMeta` (name from a `useDrivers({session_key})` lookup, color by slot, lapTime, topSpeed).
 - `statusBySlot[i]` = `empty` (no driver), `no-lap` (no valid lap), `no-telemetry` (lap but empty car_data), else `ok`.
 
@@ -41,8 +42,8 @@ Props/return shapes and responsibilities each unit must honor.
 ## Component: `TelemetryPage`
 
 **Location**: `src/components/dashboard/TelemetryPage.jsx`
-**Props**: none (reads `{ year }` from `useOutletContext()`).
-**State**: `meetingKey`, `sessionKey`, `driverNumbers` with the cascade resets.
+**Props**: none (reads `{ year }` from `useOutletContext()`). Renders an inner view keyed by `year` so changing the season remounts and resets all selections.
+**State**: `meetingKey`, `sessionKey`, `driverNumbers`, `lapNumber` (`null` = fastest) with the cascade resets. Builds `lapOptions` (`"Fastest lap"` + numbered laps) from the hook's `lapNumbers`.
 **Renders**:
 - `<Text styleAs="h2">Telemetry</Text>`
 - `<TelemetryControls …>` (events/sessions/drivers options + selected + change handlers)
@@ -54,11 +55,12 @@ Props/return shapes and responsibilities each unit must honor.
 ## Component: `TelemetryControls`
 
 **Location**: `src/components/tabs/telemetry/TelemetryControls.jsx`
-**Props**: `{ events, sessions, drivers, meetingKey, sessionKey, driverNumbers, onEventChange, onSessionChange, onDriversChange }`
-**Renders**: three Salt `Dropdown`s in `FormField`+`FormFieldLabel`, laid out with `FlexLayout`:
+**Props**: `{ events, sessions, drivers, laps, meetingKey, sessionKey, driverNumbers, lapSelected, onEventChange, onSessionChange, onDriversChange, onLapChange }`
+**Renders**: four Salt `Dropdown`s in `FormField`+`FormFieldLabel`, laid out with `FlexLayout`. Each controlled via `selected` + `value` (button text) + `onSelectionChange`:
 - **Event** — options = events; disabled if no events.
-- **Session** — options = sessions; disabled until `meetingKey`.
-- **Drivers** — `multiselect`, options = drivers, controlled `selected`; disabled until `sessionKey`; `onSelectionChange` **caps at 2** (drop the change if it would exceed two).
+- **Session** — options = sessions; disabled until sessions load.
+- **Drivers** — `multiselect`, options = drivers; disabled until sessions chosen; `onSelectionChange` **caps at 2** (drop the change if it would exceed two).
+- **Lap** — options = laps (`"Fastest lap"` + numbered); disabled until laps exist; `onLapChange(sel[0])` (raw `"fastest"`/number string; the page maps `"fastest"` → `null`).
 
 ---
 

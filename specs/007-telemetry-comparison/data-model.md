@@ -12,8 +12,9 @@ Derived view models produced from raw OpenF1 responses inside hooks/`useMemo` �
 | `meetingKey` | number \| null | Selected event |
 | `sessionKey` | number \| null | Selected session |
 | `driverNumbers` | number[] (≤2) | Selected drivers, in pick order (A then B) |
+| `lapNumber` | number \| null | Selected lap; `null` = fastest (the default) |
 
-**Cascade rule**: year change → clear meeting/session/drivers; meeting change → clear session/drivers; session change → clear drivers.
+**Cascade rule**: year change → remount (clears all); meeting change → clear session/drivers/lap; session change → clear drivers/lap; driver change → keep lap.
 
 ---
 
@@ -22,10 +23,11 @@ Derived view models produced from raw OpenF1 responses inside hooks/`useMemo` �
 - **EventOption**: `{ meeting_key, round, label }` from `useRaceCalendar(year)` (label = `meeting_name`).
 - **SessionOption**: `{ session_key, label, session_type }` from `useSessions({ meeting_key })` (label = `session_name`), sorted by `date_start`.
 - **DriverOption**: `{ driver_number, label, team_name }` from `useDrivers({ session_key })` (label = `full_name`).
+- **LapOption**: `{ value: "fastest" | number, label }` — built from the hook's `lapNumbers` (union of both drivers' timed laps): `"Fastest lap"` plus `"Lap N"` per number. The `"fastest"` value maps to `lapNumber = null`.
 
 ---
 
-## Entity: `FastestLap` (per driver, internal)
+## Entity: `SelectedLap` (per driver, internal)
 
 Derived from `/laps`. The basis for the telemetry window and headline lap time.
 
@@ -35,7 +37,7 @@ Derived from `/laps`. The basis for the telemetry window and headline lap time.
 | `date_start` | ISO string | `laps.date_start` | Telemetry window start |
 | `lap_duration` | number (s) | `laps.lap_duration` | Window length + headline lap time |
 
-**Rule**: fastest = min `lap_duration` among laps where `lap_duration != null` and `!is_pit_out_lap`. If none → that driver's slot status is `"no-lap"`.
+**Rule**: among laps where `lap_duration != null` and `!is_pit_out_lap` — if `lapNumber` is `null`, take the min `lap_duration` (fastest); otherwise the lap with that `lap_number`. If none matches → that driver's slot status is `"no-lap"` (so a lap one driver didn't run degrades just that driver).
 
 ---
 
