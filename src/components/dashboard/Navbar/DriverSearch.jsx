@@ -40,6 +40,7 @@ const DriverSearchBar = ({ onDriverSelect = () => {}, year }) => {
     <>
       <SearchIcon size={1.2} className={styles.icon} />
       <ComboBox
+        className={styles.combobox}
         value={query}
         open={isOpen}
         onOpenChange={(open) => setIsOpen(open && filteredDrivers.length > 0)}

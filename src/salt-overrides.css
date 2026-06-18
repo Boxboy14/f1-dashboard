@@ -1,4 +1,10 @@
 .salt-theme {
+  /* Salt's headings/labels/display text all derive from this one root token
+     (theme.css references it via var(), not a literal) — overriding it here
+     re-themes every text variant to Roboto in one place instead of each
+     individually, which is what was missing (h1-h4 stayed on Open Sans). */
+  --salt-typography-fontFamily-openSans: var(--font-family-primary);
+
   /* Common font + base text */
   --salt-text-fontFamily: var(--font-family-primary);
   --salt-text-fontSize: var(--fs-body);
