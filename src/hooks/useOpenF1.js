@@ -7,6 +7,10 @@ import {
   deriveDistance,
   resampleToGrid,
   mergeDrivers,
+  deriveTrackDistance,
+  resampleTrack,
+  buildDominance,
+  buildSpeedShade,
 } from "../utils/telemetry.js";
 
 function transformDrivers(data) {
@@ -139,6 +143,21 @@ function useCarDataLap(params, options) {
   return useQuery({
     queryKey: ["car_data_lap", params],
     queryFn: () => openF1Api.carDataLap(params),
+    staleTime: 30 * 60 * 1000,
+    enabled: Boolean(
+      params?.session_key &&
+        params?.driver_number &&
+        params?.date_gte &&
+        params?.date_lt
+    ),
+    ...options,
+  });
+}
+
+function useLocationLap(params, options) {
+  return useQuery({
+    queryKey: ["location_lap", params],
+    queryFn: () => openF1Api.locationLap(params),
     staleTime: 30 * 60 * 1000,
     enabled: Boolean(
       params?.session_key &&
@@ -612,6 +631,30 @@ function useTelemetryComparison(sessionKey, driverNumbers = [], lapNumber = null
     return [...set].sort((x, y) => x - y);
   }, [a.laps, b.laps]);
 
+  // The track outline is drawn from one driver's lap position trace — slot A if
+  // it has data, otherwise slot B.
+  const outline = useMemo(() => {
+    if (a.lap && a.samples.length) {
+      return { dn: slotA, lap: a.lap, slot: 0, suffix: "a" };
+    }
+    if (b.lap && b.samples.length) {
+      return { dn: slotB, lap: b.lap, slot: 1, suffix: "b" };
+    }
+    return null;
+  }, [a.lap, a.samples, b.lap, b.samples, slotA, slotB]);
+  const outlineDateLt = outline
+    ? new Date(
+        new Date(outline.lap.date_start).getTime() +
+          outline.lap.lap_duration * 1000
+      ).toISOString()
+    : null;
+  const { data: location = [], isLoading: locationLoading } = useLocationLap({
+    session_key: sessionKey,
+    driver_number: outline?.dn ?? null,
+    date_gte: outline?.lap?.date_start ?? null,
+    date_lt: outlineDateLt,
+  });
+
   const { chartData, telemetryDrivers, statusBySlot } = useMemo(() => {
     const driverMap = new Map(drivers.map((d) => [d.driver_number, d]));
     const slots = [
@@ -670,11 +713,37 @@ function useTelemetryComparison(sessionKey, driverNumbers = [], lapNumber = null
     };
   }, [slotA, slotB, a, b, drivers]);
 
+  const trackMap = useMemo(() => {
+    if (!outline) return null;
+    if (!location.length) return locationLoading ? null : { status: "no-data" };
+
+    const points = resampleTrack(
+      deriveTrackDistance(location),
+      TELEMETRY_GRID_POINTS
+    );
+    if (points.length < 2) return { status: "no-data" };
+
+    const okCount = statusBySlot.filter((s) => s === "ok").length;
+    let mode = null;
+    let faster = null;
+    let speed = null;
+    if (okCount >= 2) {
+      mode = "dominance";
+      faster = buildDominance(chartData, 24);
+    } else if (okCount === 1) {
+      mode = "speed";
+      speed = buildSpeedShade(chartData, outline.suffix);
+    }
+
+    return { points, mode, faster, speed, outlineSlot: outline.slot, status: "ok" };
+  }, [outline, location, locationLoading, chartData, statusBySlot]);
+
   return {
     chartData,
     drivers: telemetryDrivers,
     statusBySlot,
     lapNumbers,
+    trackMap,
     isLoading: a.isLoading || b.isLoading,
   };
 }
@@ -693,6 +762,7 @@ export {
   useStints,
   useCarData,
   useCarDataLap,
+  useLocationLap,
   useWeather,
   useRaceControl,
   useOvertakes,

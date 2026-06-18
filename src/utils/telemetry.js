@@ -91,10 +91,89 @@ const formatLapTime = (seconds) => {
   return `${mins}:${secs}`;
 };
 
+// ── Track map geometry ───────────────────────────────────────────────────────
+
+// Cumulative distance (m) along the racing line by straight-line arc length
+// between consecutive position samples. /location already gives positions, so
+// unlike car_data we measure distance from the path itself, not from speed.
+const deriveTrackDistance = (location) => {
+  let distance = 0;
+  let prev = null;
+  return location.map((p) => {
+    if (prev) {
+      distance += Math.hypot(p.x - prev.x, p.y - prev.y);
+    }
+    prev = p;
+    return { x: p.x, y: p.y, distance };
+  });
+};
+
+const interpolateXY = (points, distance) => {
+  if (distance <= points[0].distance) return points[0];
+  if (distance >= points.at(-1).distance) return points.at(-1);
+  const hi = points.findIndex((p) => p.distance >= distance);
+  const a = points[hi - 1];
+  const b = points[hi];
+  const span = b.distance - a.distance;
+  const t = span === 0 ? 0 : (distance - a.distance) / span;
+  return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+};
+
+// Resample the outline onto `points` evenly-spaced distances — the SAME
+// resolution as resampleToGrid, so index i lines up with chartData[i].
+const resampleTrack = (pointsWithDistance, points) => {
+  if (pointsWithDistance.length < 2) return [];
+  const total = pointsWithDistance.at(-1).distance;
+  if (total === 0) return [];
+  const step = total / (points - 1);
+  return Array.from({ length: points }, (_, i) =>
+    interpolateXY(pointsWithDistance, i * step)
+  );
+};
+
+// Per grid-point winner slot (0/1) smoothed over `minisectorCount` equal-length
+// minisectors: whoever carried more total speed through a minisector (= less
+// time over equal distance) wins all of it. null if either driver is missing.
+const buildDominance = (chartData, minisectorCount = 24) => {
+  if (!chartData.length || chartData[0].speed_a == null || chartData[0].speed_b == null) {
+    return null;
+  }
+  const n = chartData.length;
+  const faster = new Array(n);
+  const size = Math.ceil(n / minisectorCount);
+  for (let start = 0; start < n; start += size) {
+    const end = Math.min(start + size, n);
+    let sumA = 0;
+    let sumB = 0;
+    for (let i = start; i < end; i++) {
+      sumA += chartData[i].speed_a;
+      sumB += chartData[i].speed_b;
+    }
+    const winner = sumA >= sumB ? 0 : 1;
+    for (let i = start; i < end; i++) faster[i] = winner;
+  }
+  return faster;
+};
+
+// Per grid-point speed normalized 0..1 across the lap for one driver (`a`/`b`).
+const buildSpeedShade = (chartData, suffix) => {
+  const key = `speed_${suffix}`;
+  const values = chartData.map((r) => r[key]);
+  if (values.some((v) => v == null)) return null;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  return values.map((v) => (v - min) / span);
+};
+
 export {
   deriveDistance,
   resampleToGrid,
   mergeDrivers,
   decodeDrs,
   formatLapTime,
+  deriveTrackDistance,
+  resampleTrack,
+  buildDominance,
+  buildSpeedShade,
 };

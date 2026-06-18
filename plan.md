@@ -131,9 +131,9 @@ This is the working plan for the F1 Dashboard. Claude Code refers to this when g
 
 ### Phase 2 — Visualizations
 - ✅ Recharts added; telemetry comparison page (`/telemetry`) built — `specs/007-telemetry-comparison/`.
+- ✅ Track map + minisector "fastest where" dominance heatmap (custom SVG from `/location` data) on the telemetry page — `specs/008-track-dominance-map/`.
 - Lap time chart on session detail.
 - Tire strategy timeline (custom SVG).
-- Track map SVG using `/location` data (and the telemetry minisector "fastest where" heatmap).
 - Pace distribution histogram, degradation chart, driver-vs-driver delta.
 
 ### Phase 3 — AI Assistant

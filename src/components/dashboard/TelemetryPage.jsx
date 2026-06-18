@@ -9,6 +9,7 @@ import {
 } from "../../hooks/useOpenF1.js";
 import TelemetryControls from "../tabs/telemetry/TelemetryControls.jsx";
 import DriverSummary from "../tabs/telemetry/DriverSummary.jsx";
+import TrackMap from "../tabs/telemetry/TrackMap.jsx";
 import TelemetryCharts from "../tabs/telemetry/TelemetryCharts.jsx";
 import styles from "./TelemetryPage.module.scss";
 
@@ -108,6 +109,7 @@ const TelemetryView = ({ year }) => {
     chartData,
     drivers: telemetryDrivers,
     lapNumbers,
+    trackMap,
     isLoading,
   } = useTelemetryComparison(sessionKey, driverNumbers, lapNumber);
 
@@ -158,6 +160,7 @@ const TelemetryView = ({ year }) => {
       ) : (
         <>
           <DriverSummary drivers={telemetryDrivers} />
+          <TrackMap trackMap={trackMap} drivers={telemetryDrivers} />
           {hasData ? (
             <TelemetryCharts
               chartData={chartData}
