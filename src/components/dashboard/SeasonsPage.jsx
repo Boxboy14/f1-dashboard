@@ -20,7 +20,7 @@ const SeasonsPage = () => {
 
   return (
     <>
-      <Text styleAs="h2">Calendar</Text>
+      <Text styleAs="h1">Calendar</Text>
       <CalendarGrid year={year} onRaceOpen={openRaceDetail} />
     </>
   );

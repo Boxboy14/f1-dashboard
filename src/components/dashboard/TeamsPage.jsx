@@ -36,7 +36,7 @@ const TeamsPage = () => {
 
   return (
     <>
-      <Text styleAs="h2">Teams</Text>
+      <Text styleAs="h1">Teams</Text>
       <TeamsGrid year={year} onTeamOpen={openTeamDetail} />
       <TeamDetailCard
         isOpen={Boolean(teamSlug && selectedTeam)}

@@ -18,7 +18,7 @@ All API access flows through `src/services/api/openf1.js` and `src/hooks/useOpen
 No premature abstractions. No dead code. No backwards-compat shims. No defensive error handling for scenarios that cannot happen. Comments explain WHY (a constraint, a workaround, a non-obvious invariant) — never WHAT. Names must be self-explanatory. Functions must do one thing.
 
 ### VI. UI Consistency
-Salt Design System is the first choice for every UI element — buttons, inputs, dialogs, layouts. Build custom only when Salt explicitly does not support the use case. The dark theme (`--color-bg-primary: #1a1a1a`) is fixed — no light mode support in v1.
+Salt Design System is the first choice for every UI element — buttons, inputs, dialogs, layouts. Build custom only when Salt explicitly does not support the use case. Color must come from Salt tokens (semantic tokens for surfaces/text/borders, palette tokens for accents and data series) — never raw hex. The app supports a user-switchable dark/light theme (default dark, persisted) driven by `SaltProvider mode`; both themes must remain legible.
 
 ### VII. Learning Is a First-Class Goal
 This project exists to sharpen frontend skills and learn AI integration. Every architectural decision must be explainable. Clever code is wrong code here. When a new library is introduced, its mental model must be documented. Complexity that cannot be explained to a learning developer is complexity that should not exist.
@@ -33,4 +33,8 @@ This project exists to sharpen frontend skills and learn AI integration. Every a
 
 This constitution supersedes informal decisions. Amendments require updating this file with a rationale comment. All PRs must comply with Articles I–VII — violations must be explicitly justified in the PR description.
 
-**Version**: 1.0.0 | **Ratified**: 2026-05-28 | **Last Amended**: 2026-05-28
+<!-- Amendment 2026-06-18 (v1.1.0): Article VI relaxed to allow a user-switchable
+dark/light theme (feature 009) and to mandate Salt color tokens over raw hex,
+reflecting that users prefer choosing their theme. -->
+
+**Version**: 1.1.0 | **Ratified**: 2026-05-28 | **Last Amended**: 2026-06-18

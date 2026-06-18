@@ -1,12 +1,11 @@
 $sidebar-width: 220px;
 $navbar-height: 56px;
-$f1-red: #e10600;
 $mobile-breakpoint: 768px;
 
 .sidebar {
   width: $sidebar-width;
   background-color: var(--color-bg-secondary);
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid var(--color-border);
   flex-shrink: 0;
   overflow-y: auto;
 
@@ -67,8 +66,8 @@ $mobile-breakpoint: 768px;
 
   &.active {
     color: var(--color-text-primary);
-    border-left-color: $f1-red;
-    background-color: rgba($f1-red, 0.08);
+    border-left-color: var(--color-accent);
+    background-color: color-mix(in srgb, var(--color-accent) 8%, transparent);
   }
 
   &.disabled {

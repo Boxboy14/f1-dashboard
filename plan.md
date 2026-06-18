@@ -14,12 +14,12 @@ This is the working plan for the F1 Dashboard. Claude Code refers to this when g
 - Historical data from **2023 onwards** (OpenF1 free tier — 3 seasons: 2023, 2024, 2025).
 - Single data source: OpenF1 only. No secondary APIs.
 - Desktop + mobile responsive UI.
-- Dark theme only.
+- Design system (feature 009): Roboto font, a categorized type scale (page > section > sub), and a restrained Salt-token color scheme (neutral surfaces, sparing red accent — no raw hex).
+- User-switchable **dark/light theme** (navbar toggle, default dark, persisted) via `SaltProvider mode`.
 - All four viz styles: line/bar charts, SVG track map, telemetry overlays, tire-strategy timelines.
 
 **Out of scope (v1):**
 - Live timing / real-time data (requires OpenF1 paid tier).
-- Light mode.
 - User accounts, favourites, comments, sharing.
 - Server-side persistence — everything is fetched on demand and cached client-side.
 
@@ -88,10 +88,11 @@ This is the working plan for the F1 Dashboard. Claude Code refers to this when g
 - Tire strategy timeline (Phase 2).
 - Pit stop table.
 
-**`/sessions/:key/telemetry` — Telemetry viewer (Phase 2)**
-- Driver selector (1 or 2 for comparison).
-- Speed/throttle/brake/gear traces.
-- DRS activation zones.
+**`/telemetry` — Telemetry comparison (BUILT)**
+- Standalone, year-scoped page: Select Event → Session → Drivers (max 2) dropdowns.
+- Each driver's fastest lap of the session; six Recharts traces (speed, throttle, brake, gear, RPM, DRS) over derived distance, two-color overlay, linked hover cursor.
+- Fetches only the fastest-lap car_data window (ranged `carDataLap`), not the whole session.
+- 3-sector coloring, minisector heatmap, and track map remain future. See `specs/007-telemetry-comparison/`.
 
 **`/track/:meeting_key` — Track map (Phase 2)**
 - SVG track outline from `/location` data.
@@ -129,11 +130,10 @@ This is the working plan for the F1 Dashboard. Claude Code refers to this when g
 - Decide what the disabled `/sessions` sidebar entry should show (standalone recent-sessions list) or remove it.
 
 ### Phase 2 — Visualizations
-- Add Recharts.
+- ✅ Recharts added; telemetry comparison page (`/telemetry`) built — `specs/007-telemetry-comparison/`.
+- ✅ Track map + minisector "fastest where" dominance heatmap (custom SVG from `/location` data) on the telemetry page — `specs/008-track-dominance-map/`.
 - Lap time chart on session detail.
 - Tire strategy timeline (custom SVG).
-- Track map SVG using `/location` data.
-- Telemetry overlays (`/car_data`): speed, throttle, brake, DRS.
 - Pace distribution histogram, degradation chart, driver-vs-driver delta.
 
 ### Phase 3 — AI Assistant
@@ -214,11 +214,11 @@ Constitution: `.specify/memory/constitution.md` (Articles I–VII).
 
 **Branch:** `feature-overview-tab`
 
-**Built so far:** Drivers, Teams, Calendar → Meeting → Session detail, and the Overview season dashboard. All via the Speckit workflow (`specs/001`–`006`).
+**Built so far:** Drivers, Teams, Calendar → Meeting → Session detail, the Overview season dashboard, and the Telemetry comparison page. All via the Speckit workflow (`specs/001`–`007`).
 
 **Immediate next actions (in order):**
 1. Refactor `src/components/dashboard/Sidebar/Sidebar.jsx` to Salt DS components (replaces raw `<aside>`/`<nav>`/`<NavLink>`) — last Phase 1 cleanup.
-2. Begin Phase 2 visualizations (Recharts already installed): lap-time chart on the session detail page, then tire-strategy timeline.
+2. Continue Phase 2 visualizations: lap-time chart on session detail, then tire-strategy timeline; later the track map + telemetry minisector heatmap.
 3. Resolve the disabled `/sessions` sidebar entry (define a standalone sessions view or remove it).
 
 When in doubt about what to build next, follow this list top-down.

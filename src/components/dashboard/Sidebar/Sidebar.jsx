@@ -15,7 +15,7 @@ const NAV_ITEMS = [
   { label: "Teams", icon: UserGroupIcon, path: "/teams" },
   { label: "Calendar", icon: CalendarIcon, path: "/seasons" },
   { label: "Sessions", icon: FlagIcon, path: "/sessions", disabled: true },
-  { label: "Telemetry", icon: ChartLineIcon, path: "/telemetry", disabled: true },
+  { label: "Telemetry", icon: ChartLineIcon, path: "/telemetry" },
 ];
 
 const Sidebar = ({ isOpen, onClose }) => {

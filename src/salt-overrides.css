@@ -1,7 +1,35 @@
 .salt-theme {
+  /* Salt's headings/labels/display text all derive from this one root token
+     (theme.css references it via var(), not a literal) — overriding it here
+     re-themes every text variant to Roboto in one place instead of each
+     individually, which is what was missing (h1-h4 stayed on Open Sans). */
+  --salt-typography-fontFamily-openSans: var(--font-family-primary);
+
+  /* Common font + base text */
   --salt-text-fontFamily: var(--font-family-primary);
-  --salt-text-fontSize: var(--font-size-base);
+  --salt-text-fontSize: var(--fs-body);
   --salt-text-lineHeight: var(--line-height-normal);
   --salt-text-letterSpacing: normal;
   --salt-text-fontWeight: var(--font-weight-normal);
+
+  /* Categorized headers mapped to the type scale */
+  --salt-text-h1-fontSize: var(--fs-page);
+  --salt-text-h1-fontWeight: var(--font-weight-bold);
+  --salt-text-h2-fontSize: var(--fs-section);
+  --salt-text-h2-fontWeight: var(--font-weight-semibold);
+  --salt-text-h3-fontSize: var(--fs-subsection);
+  --salt-text-h3-fontWeight: var(--font-weight-semibold);
+
+  /* Retint Salt's accent to red — applied sparingly (active nav, CTA, focus) */
+  --salt-palette-accent-background: var(--salt-color-red-500);
+  --salt-palette-accent-border: var(--salt-color-red-500);
+  --salt-palette-accent-foreground: var(--salt-color-white);
+  --salt-palette-accent-action: var(--salt-color-red-500);
+  --salt-palette-accent-strong: var(--salt-color-red-400);
+  --salt-palette-accent-stronger: var(--salt-color-red-300);
+  --salt-palette-accent-strongest: var(--salt-color-red-200);
+  --salt-palette-accent-weak: var(--salt-color-red-600);
+  --salt-palette-accent-weaker: var(--salt-color-red-700);
+  --salt-palette-accent-weakest: var(--salt-color-red-800);
+  --salt-palette-accent-disabled: var(--salt-color-red-500-40a);
 }

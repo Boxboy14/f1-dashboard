@@ -8,15 +8,17 @@ const defaultColDefs = {
   resizable: true,
 };
 
+// ag-grid applies these params as CSS custom properties, so var(--salt-…) refs
+// resolve and re-theme automatically when SaltProvider flips mode.
 const gridTheme = themeQuartz.withParams({
-  backgroundColor: "#0f0f0f",
-  foregroundColor: "#e5e7eb",
-  headerBackgroundColor: "#1a1a1a",
-  headerForegroundColor: "#ffffff",
-  rowHoverColor: "#1f1f1f",
-  selectedRowBackgroundColor: "#262626",
-  borderColor: "#2a2a2a",
-  browserColorScheme: "dark",
+  backgroundColor: "var(--salt-container-primary-background)",
+  foregroundColor: "var(--salt-content-primary-foreground)",
+  headerBackgroundColor: "var(--salt-container-secondary-background)",
+  headerForegroundColor: "var(--salt-content-primary-foreground)",
+  rowHoverColor: "var(--salt-container-tertiary-background)",
+  selectedRowBackgroundColor: "var(--salt-container-tertiary-background)",
+  borderColor: "var(--salt-separable-secondary-borderColor)",
+  browserColorScheme: "inherit",
 });
 
 const DataGrid = ({ rowData, columnDefs, onGridReady, ...rest }) => {

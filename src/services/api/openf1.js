@@ -12,13 +12,28 @@ function buildUrl(endpoint, params = {}) {
   return url.toString();
 }
 
-async function fetchOpenF1(endpoint, params = {}) {
-  const url = buildUrl(endpoint, params);
+async function fetchOpenF1Url(url) {
   const response = await schedule(() => fetch(url));
   if (!response.ok) {
     throw new Error(`OpenF1 API error: ${response.status} ${response.statusText}`);
   }
   return response.json();
+}
+
+function fetchOpenF1(endpoint, params = {}) {
+  return fetchOpenF1Url(buildUrl(endpoint, params));
+}
+
+// Ranged single-lap fetch for time-series endpoints (car_data, location).
+// buildUrl can't express the `date>=` / `date<` operators, so we assemble the
+// URL by hand: operators percent-encoded, and the timestamp value
+// encodeURIComponent-ed so its `+00:00` offset survives (a bare `+` would be
+// read as a space).
+function rangedLapUrl(endpoint, { session_key, driver_number, date_gte, date_lt }) {
+  return (
+    `${BASE_URL}/${endpoint}?session_key=${session_key}&driver_number=${driver_number}` +
+    `&date%3E=${encodeURIComponent(date_gte)}&date%3C${encodeURIComponent(date_lt)}`
+  );
 }
 
 export const openF1Api = {
@@ -35,7 +50,9 @@ export const openF1Api = {
   intervals: (params) => fetchOpenF1("/intervals", params),
   position: (params) => fetchOpenF1("/position", params),
   carData: (params) => fetchOpenF1("/car_data", params),
+  carDataLap: (params) => fetchOpenF1Url(rangedLapUrl("car_data", params)),
   location: (params) => fetchOpenF1("/location", params),
+  locationLap: (params) => fetchOpenF1Url(rangedLapUrl("location", params)),
   raceControl: (params) => fetchOpenF1("/race_control", params),
   teamRadio: (params) => fetchOpenF1("/team_radio", params),
   weather: (params) => fetchOpenF1("/weather", params),

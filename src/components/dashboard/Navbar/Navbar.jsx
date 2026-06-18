@@ -2,6 +2,7 @@ import { MenuIcon } from "@salt-ds/icons";
 import styles from "./Navbar.module.scss";
 import DriverSearchBar from "./DriverSearch.jsx";
 import YearSelector from "./YearSelector.jsx";
+import ThemeToggle from "../../../theme/ThemeToggle.jsx";
 
 const Navbar = ({ onDriverSelect, onMenuClick, year, onYearChange }) => {
   return (
@@ -19,6 +20,7 @@ const Navbar = ({ onDriverSelect, onMenuClick, year, onYearChange }) => {
       <div className={styles.right}>
         <DriverSearchBar onDriverSelect={onDriverSelect} year={year} />
         <YearSelector value={year} onChange={onYearChange} />
+        <ThemeToggle />
       </div>
     </header>
   );

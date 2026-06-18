@@ -46,7 +46,7 @@ const SessionDetailPage = () => {
       <Button variant="secondary" onClick={goBack}>
         ← Back to Meeting
       </Button>
-      <Text styleAs="h2">{session.session_name} Results</Text>
+      <Text styleAs="h1">{session.session_name} Results</Text>
       <Text>{formatSessionDate(session.date_start)}</Text>
       {isSessionTypeQualifying && (
         <Text className={styles.startingGridLabel}>Starting Grid</Text>
