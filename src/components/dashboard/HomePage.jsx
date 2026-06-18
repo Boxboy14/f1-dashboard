@@ -7,7 +7,7 @@ const HomePage = () => {
 
   return (
     <>
-      <Text styleAs="h2">Drivers</Text>
+      <Text styleAs="h1">Drivers</Text>
       <DriversGrid year={year} onDriverOpen={openDriverInfo} />
     </>
   );

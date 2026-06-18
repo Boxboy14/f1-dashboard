@@ -6,7 +6,12 @@ import useInView from "../../../hooks/useInView.js";
 import { formatWeekend } from "./utils/formatters.js";
 import styles from "./GrandPrixCard.module.scss";
 
-const PODIUM_COLOR = { 1: "#FFD700", 2: "#C0C0C0", 3: "#CD7F32" };
+// Gold / silver / bronze, mapped to the nearest Salt palette tokens.
+const PODIUM_COLOR = {
+  1: "var(--salt-color-citrine-500)",
+  2: "var(--salt-color-gray-300)",
+  3: "var(--salt-color-brown-500)",
+};
 
 const GrandPrixCard = ({ gp, driversByNumber, onOpenMeeting }) => {
   const [ref, inView] = useInView();
@@ -44,7 +49,7 @@ const GrandPrixCard = ({ gp, driversByNumber, onOpenMeeting }) => {
           <div className={styles.header}>
             <span className={styles.title}>
               <span className={styles.round}>R{gp.round}</span>
-              <Text styleAs="h2" className={styles.name}>
+              <Text styleAs="h3" className={styles.name}>
                 {gp.meeting_name}
               </Text>
               {gp.country_flag && (

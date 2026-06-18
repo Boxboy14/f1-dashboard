@@ -33,7 +33,7 @@ const OverviewPage = () => {
 
   return (
     <>
-      <Text styleAs="h2">Overview</Text>
+      <Text styleAs="h1">Overview</Text>
       <SeasonKpiStrip kpis={kpis} isLoading={kpisLoading} />
       {isLoading && !grandPrix.length ? (
         <CircularProgress aria-label="Loading season" />

@@ -65,7 +65,7 @@ const TrackMap = ({ trackMap, drivers }) => {
           .map((p) => `${p.x},${p.y}`)
           .join(" ")}
         fill="none"
-        stroke={DRIVER_COLORS[g.slot]}
+        style={{ stroke: DRIVER_COLORS[g.slot] }}
         strokeWidth={3}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -81,7 +81,7 @@ const TrackMap = ({ trackMap, drivers }) => {
         y1={p.y}
         x2={sp[i + 1].x}
         y2={sp[i + 1].y}
-        stroke={color}
+        style={{ stroke: color }}
         strokeOpacity={0.25 + 0.75 * speed[i]}
         strokeWidth={3}
         strokeLinecap="round"
@@ -93,7 +93,7 @@ const TrackMap = ({ trackMap, drivers }) => {
       <polyline
         points={sp.map((p) => `${p.x},${p.y}`).join(" ")}
         fill="none"
-        stroke={DRIVER_COLORS[outlineSlot] ?? "#888888"}
+        style={{ stroke: DRIVER_COLORS[outlineSlot] ?? "var(--salt-color-gray-500)" }}
         strokeWidth={3}
         strokeLinecap="round"
         strokeLinejoin="round"

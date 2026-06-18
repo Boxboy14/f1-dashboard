@@ -135,7 +135,7 @@ const TelemetryView = ({ year }) => {
 
   return (
     <>
-      <Text styleAs="h2">Telemetry</Text>
+      <Text styleAs="h1">Telemetry</Text>
       <TelemetryControls
         events={eventOptions}
         sessions={sessionOptions}

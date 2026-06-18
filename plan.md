@@ -14,12 +14,12 @@ This is the working plan for the F1 Dashboard. Claude Code refers to this when g
 - Historical data from **2023 onwards** (OpenF1 free tier — 3 seasons: 2023, 2024, 2025).
 - Single data source: OpenF1 only. No secondary APIs.
 - Desktop + mobile responsive UI.
-- Dark theme only.
+- Design system (feature 009): Roboto font, a categorized type scale (page > section > sub), and a restrained Salt-token color scheme (neutral surfaces, sparing red accent — no raw hex).
+- User-switchable **dark/light theme** (navbar toggle, default dark, persisted) via `SaltProvider mode`.
 - All four viz styles: line/bar charts, SVG track map, telemetry overlays, tire-strategy timelines.
 
 **Out of scope (v1):**
 - Live timing / real-time data (requires OpenF1 paid tier).
-- Light mode.
 - User accounts, favourites, comments, sharing.
 - Server-side persistence — everything is fetched on demand and cached client-side.
 
