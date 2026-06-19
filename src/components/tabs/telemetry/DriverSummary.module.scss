@@ -5,12 +5,14 @@
 .card {
   --saltCard-padding: 0;
   display: flex;
-  min-height: 240px;
+  min-height: 200px;
   overflow: hidden;
+  border-top: 3px solid var(--accent, var(--color-accent));
 }
 
 .photoWrap {
-  width: 30%;
+  width: 26%;
+  min-width: 110px;
   flex-shrink: 0;
   display: flex;
   align-items: flex-end;
@@ -37,23 +39,146 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  padding: 16px 20px;
+  padding: 20px 28px;
+}
+
+// ── Header: identity (left) + lap-time block (right) ─────────────────────────
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.identity {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  color: var(--salt-content-primary-foreground);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .team {
-  margin-top: 2px;
-  font-size: 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--salt-content-secondary-foreground);
 }
 
-.stats {
+.lapBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.lapLabel {
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--salt-content-secondary-foreground);
+}
+
+.lapValue {
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--salt-content-primary-foreground);
+
+  &[data-highlight="true"] {
+    color: var(--accent);
+  }
+}
+
+.fastest {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--salt-color-green-500);
+}
+
+.delta {
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--salt-content-secondary-foreground);
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 16px 0;
+}
+
+// ── Stats row: Sectors · Top speed · Tyre ────────────────────────────────────
+.statsRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
   margin-top: auto;
+}
+
+.statCol {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.statLabel {
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--salt-content-secondary-foreground);
+}
+
+.statValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--salt-content-primary-foreground);
+}
+
+.sectors {
+  font-variant-numeric: tabular-nums;
+}
+
+.bigNum {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--salt-content-secondary-foreground);
+}
+
+.statUnavailable {
+  font-size: 1.05rem;
+  color: var(--salt-content-secondary-foreground);
+}
+
+.statusNote {
+  margin-top: 16px;
 }

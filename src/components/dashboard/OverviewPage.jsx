@@ -1,5 +1,9 @@
 import { useCallback, useMemo } from "react";
-import { useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
+import {
+  useNavigate,
+  useOutletContext,
+  useSearchParams,
+} from "react-router-dom";
 import { CircularProgress, Text } from "@salt-ds/core";
 import {
   useSeasonGrandPrix,
@@ -19,7 +23,7 @@ const OverviewPage = () => {
 
   const driversByNumber = useMemo(
     () => new Map(drivers.map((d) => [d.driver_number, d])),
-    [drivers]
+    [drivers],
   );
 
   const onOpenMeeting = useCallback(
@@ -28,12 +32,12 @@ const OverviewPage = () => {
         pathname: `/meetings/${meetingKey}`,
         search: searchParams.toString(),
       }),
-    [navigate, searchParams]
+    [navigate, searchParams],
   );
 
   return (
     <>
-      <Text styleAs="h1">Overview</Text>
+      <Text styleAs="h1">{year} Season Overview</Text>
       <SeasonKpiStrip kpis={kpis} isLoading={kpisLoading} />
       {isLoading && !grandPrix.length ? (
         <CircularProgress aria-label="Loading season" />

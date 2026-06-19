@@ -24,16 +24,33 @@ const TelemetryChart = ({ channel, data, drivers, lapLabel }) => {
     ? `${channel.label} (${channel.unit})`
     : channel.label;
 
+  // Tooltip value: DRS reads On/Off; "%" hugs the number (kept as-is); every
+  // other metric is rounded up to a whole number (decimals are noise here),
+  // then suffixed — "300 km/h", "11500 RPM", or the bare number (gear).
+  const formatValue = (value) => {
+    if (value == null) return value;
+    if (channel.key === "drs") return Number(value) >= 1 ? "On" : "Off";
+    if (channel.unit === "%") return `${value}%`;
+    const v = Math.ceil(value);
+    if (channel.key === "rpm") return `${v} RPM`;
+    if (!channel.unit) return v;
+    return `${v} ${channel.unit}`;
+  };
+
   return (
     <div className={styles.chart}>
-      <ResponsiveContainer width="100%" height={210}>
-        <LineChart data={data} syncId="telemetry" margin={{ top: 8, right: 16, bottom: 4, left: 8 }}>
+      <ResponsiveContainer width="100%" height={350}>
+        <LineChart
+          data={data}
+          syncId="telemetry"
+          margin={{ top: 8, right: 16, bottom: 4, left: 8 }}
+        >
           <CartesianGrid vertical={false} />
-          <XAxis dataKey="distance" tick={{ fontSize: 11 }} unit="m" />
+          <XAxis dataKey="distance" tick={{ fontSize: 12 }} unit="m" />
           <YAxis
             domain={channel.domain}
-            tick={{ fontSize: 11 }}
-            width={72}
+            tick={{ fontSize: 12 }}
+            width={76}
             allowDecimals={false}
             label={{
               value: axisTitle,
@@ -42,7 +59,7 @@ const TelemetryChart = ({ channel, data, drivers, lapLabel }) => {
               style: {
                 textAnchor: "middle",
                 fill: LABEL_FILL,
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: 600,
               },
             }}
@@ -54,6 +71,7 @@ const TelemetryChart = ({ channel, data, drivers, lapLabel }) => {
               borderRadius: 6,
             }}
             labelFormatter={(d) => `${lapLabel} · ${d} m`}
+            formatter={(value) => formatValue(value)}
           />
           {lines.map((d) => (
             <Line
