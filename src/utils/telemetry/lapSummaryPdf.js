@@ -73,14 +73,14 @@ export function downloadLapSummary(report) {
     y += LINE;
   };
 
-  // Title
-  write(
-    `${report.year} ${report.gpName} — Summary of ${report.lapLabel} . ${report.circuitName} . ${report.sessionName}`,
-    {
-      size: 16,
-      style: "bold",
-    },
-  );
+  // Title (parts joined by a centered bullet) + "Summary of …" subheader below.
+  const titleParts = [
+    `${report.year} ${report.gpName}`,
+    report.circuitName,
+    report.sessionName,
+  ].filter(Boolean);
+  write(titleParts.join("  •  "), { size: 16, style: "bold", gap: LINE });
+  write(`Summary of ${report.lapLabel}`, { size: 12, gap: LINE });
   y += 2;
 
   // Per-driver blocks
