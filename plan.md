@@ -48,7 +48,7 @@ This is the working plan for the F1 Dashboard. Claude Code refers to this when g
 
 ### Built
 - `/` → redirects to `/drivers`
-- `/drivers` — drivers grid (ag-grid), session_key=latest
+- `/drivers` — drivers grid (ag-grid, narrow left column) + season standings charts — Driver Points Evolution and Driver Ranking Evolution (Recharts, team-coloured, flag X-axis, per-round hover) — `specs/011-drivers-standings-charts/`
 - `/drivers/:slug` — driver detail card (opened from grid row or search)
 
 ### Planned
