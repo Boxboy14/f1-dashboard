@@ -3,8 +3,10 @@ import { useNavigate, useOutletContext, useParams, useSearchParams } from "react
 import { Text } from "@salt-ds/core";
 import TeamsGrid from "../tabs/teams/TeamsGrid.jsx";
 import TeamDetailCard from "../tabs/teams/TeamDetailCard.jsx";
+import TeamStandingsCharts from "../tabs/teams/standings/TeamStandingsCharts.jsx";
 import { useTeamsByYear } from "../../hooks/useOpenF1.js";
 import { createTeamSlug } from "../../store/teams/utils.js";
+import styles from "./TeamsPage.module.scss";
 
 const TeamsPage = () => {
   const { year } = useOutletContext();
@@ -37,7 +39,14 @@ const TeamsPage = () => {
   return (
     <>
       <Text styleAs="h1">Teams</Text>
-      <TeamsGrid year={year} onTeamOpen={openTeamDetail} />
+      <div className={styles.layout}>
+        <div className={styles.gridCol}>
+          <TeamsGrid year={year} onTeamOpen={openTeamDetail} />
+        </div>
+        <div className={styles.chartsCol}>
+          <TeamStandingsCharts year={year} />
+        </div>
+      </div>
       <TeamDetailCard
         isOpen={Boolean(teamSlug && selectedTeam)}
         teamData={selectedTeam}

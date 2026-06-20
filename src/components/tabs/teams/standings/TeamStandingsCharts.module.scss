@@ -1,0 +1,93 @@
+.charts {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.panel {
+  background: var(--salt-container-primary-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px 16px 8px;
+}
+
+.title {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.message {
+  margin-top: 16px;
+}
+
+// ── Custom tooltip ───────────────────────────────────────────────────────────
+.tooltip {
+  border-radius: 6px;
+  padding: 8px 10px;
+  min-width: 180px;
+  font-size: 12px;
+}
+
+.tooltipHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--color-border);
+  font-weight: 700;
+}
+
+.tooltipFlag {
+  width: 20px;
+  height: 13px;
+  object-fit: contain;
+}
+
+.tooltipCountry {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tooltipRound {
+  color: var(--salt-content-secondary-foreground);
+  font-weight: 600;
+}
+
+.tooltipList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tooltipPos {
+  width: 22px;
+  color: var(--salt-content-secondary-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.tooltipName {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tooltipVal {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}

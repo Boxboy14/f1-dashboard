@@ -5,20 +5,14 @@ import styles from "./TeamsGrid.module.scss";
 
 const columnDefs = [
   { headerName: "Rank", field: "position_current", sortable: true, width: 80 },
-  { headerName: "Team", field: "team_name", sortable: true, flex: 1, cellRenderer: TeamCellRenderer },
+  {
+    headerName: "Team",
+    field: "team_name",
+    sortable: true,
+    flex: 1,
+    cellRenderer: TeamCellRenderer,
+  },
   { headerName: "Points", field: "points_current", sortable: true, width: 100 },
-  {
-    headerName: "Driver 1",
-    valueGetter: ({ data }) => data.drivers[0]?.full_name ?? "—",
-    sortable: false,
-    flex: 1,
-  },
-  {
-    headerName: "Driver 2",
-    valueGetter: ({ data }) => data.drivers[1]?.full_name ?? "—",
-    sortable: false,
-    flex: 1,
-  },
 ];
 
 const TeamsGrid = ({ year, onTeamOpen = () => {} }) => {
