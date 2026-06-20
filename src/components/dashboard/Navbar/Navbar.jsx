@@ -3,8 +3,14 @@ import styles from "./Navbar.module.scss";
 import DriverSearchBar from "./DriverSearch.jsx";
 import YearSelector from "./YearSelector.jsx";
 import ThemeToggle from "../../../theme/ThemeToggle.jsx";
+import useTheme from "../../../theme/useTheme.js";
+import logoDark from "../../../images/app-logo/f1-dashboard-logo-dark.svg";
+import logoLight from "../../../images/app-logo/f1-dashboard-logo-light.svg";
 
 const Navbar = ({ onDriverSelect, onMenuClick, year, onYearChange }) => {
+  const { theme } = useTheme();
+  const logo = theme === "light" ? logoLight : logoDark;
+
   return (
     <header className={styles.navbar}>
       <div className={styles.left}>
@@ -15,7 +21,7 @@ const Navbar = ({ onDriverSelect, onMenuClick, year, onYearChange }) => {
         >
           <MenuIcon size={1.25} />
         </button>
-        <div className={styles.brand}>F1 Dashboard</div>
+        <img src={logo} alt="F1 Dashboard" className={styles.brand} />
       </div>
       <div className={styles.right}>
         <DriverSearchBar onDriverSelect={onDriverSelect} year={year} />

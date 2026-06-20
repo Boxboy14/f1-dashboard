@@ -5,8 +5,12 @@ import {
   useRaceCalendar,
   useSessions,
   useDrivers,
+  useStints,
   useTelemetryComparison,
 } from "../../hooks/useOpenF1.js";
+import { compoundForLap, tyreAgeForLap } from "../../utils/telemetry/tyres.js";
+import { buildLapSummary } from "../../utils/telemetry/lapSummary.js";
+import { downloadLapSummary } from "../../utils/telemetry/lapSummaryPdf.js";
 import TelemetryControls from "../tabs/telemetry/TelemetryControls.jsx";
 import DriverSummary from "../tabs/telemetry/DriverSummary.jsx";
 import TrackMap from "../tabs/telemetry/TrackMap.jsx";
@@ -35,23 +39,29 @@ const TelemetryPage = () => {
 
 const TelemetryView = ({ year }) => {
   const [meetingKey, setMeetingKey] = useState(
-    () => readStored(year)?.meetingKey ?? null
+    () => readStored(year)?.meetingKey ?? null,
   );
   const [sessionKey, setSessionKey] = useState(
-    () => readStored(year)?.sessionKey ?? null
+    () => readStored(year)?.sessionKey ?? null,
   );
   const [driverNumbers, setDriverNumbers] = useState(
-    () => readStored(year)?.driverNumbers ?? []
+    () => readStored(year)?.driverNumbers ?? [],
   );
   const [lapNumber, setLapNumber] = useState(
-    () => readStored(year)?.lapNumber ?? null
+    () => readStored(year)?.lapNumber ?? null,
   ); // null = fastest lap
 
   useEffect(() => {
     try {
       sessionStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ year, meetingKey, sessionKey, driverNumbers, lapNumber })
+        JSON.stringify({
+          year,
+          meetingKey,
+          sessionKey,
+          driverNumbers,
+          lapNumber,
+        }),
       );
     } catch {
       /* sessionStorage unavailable — selections just won't persist */
@@ -61,11 +71,15 @@ const TelemetryView = ({ year }) => {
   const { data: meetings = [] } = useRaceCalendar(year);
   const { data: sessions = [] } = useSessions(
     { meeting_key: meetingKey },
-    { enabled: Boolean(meetingKey) }
+    { enabled: Boolean(meetingKey) },
   );
   const { data: drivers = [] } = useDrivers(
     { session_key: sessionKey },
-    { enabled: Boolean(sessionKey) }
+    { enabled: Boolean(sessionKey) },
+  );
+  const { data: stints = [] } = useStints(
+    { session_key: sessionKey },
+    { enabled: Boolean(sessionKey) },
   );
 
   const eventOptions = useMemo(
@@ -74,18 +88,18 @@ const TelemetryView = ({ year }) => {
         value: m.meeting_key,
         label: `R${m.round} · ${m.meeting_name}`,
       })),
-    [meetings]
+    [meetings],
   );
   const sessionOptions = useMemo(
     () =>
       [...sessions]
         .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))
         .map((s) => ({ value: s.session_key, label: s.session_name })),
-    [sessions]
+    [sessions],
   );
   const driverOptions = useMemo(
     () => drivers.map((d) => ({ value: d.driver_number, label: d.full_name })),
-    [drivers]
+    [drivers],
   );
 
   const onEventChange = useCallback((value) => {
@@ -102,7 +116,7 @@ const TelemetryView = ({ year }) => {
   const onDriversChange = useCallback((value) => setDriverNumbers(value), []);
   const onLapChange = useCallback(
     (value) => setLapNumber(value === "fastest" ? null : Number(value)),
-    []
+    [],
   );
 
   const {
@@ -113,6 +127,25 @@ const TelemetryView = ({ year }) => {
     isLoading,
   } = useTelemetryComparison(sessionKey, driverNumbers, lapNumber);
 
+  // Enrich each driver with tyre compound/age for the displayed lap and the
+  // lap-time gap to the faster driver (only meaningful with two timed laps).
+  const enrichedDrivers = useMemo(() => {
+    const okTimes = telemetryDrivers
+      .filter((d) => d.status === "ok" && d.lapTime != null)
+      .map((d) => d.lapTime);
+    const fastest = okTimes.length ? Math.min(...okTimes) : null;
+    const compare = okTimes.length >= 2;
+    return telemetryDrivers.map((d) => ({
+      ...d,
+      compound: compoundForLap(stints, d.driver_number, d.lap_number),
+      tyreAge: tyreAgeForLap(stints, d.driver_number, d.lap_number),
+      delta:
+        compare && d.status === "ok" && d.lapTime != null
+          ? d.lapTime - fastest
+          : null,
+    }));
+  }, [telemetryDrivers, stints]);
+
   const lapOptions = useMemo(
     () =>
       lapNumbers.length
@@ -121,7 +154,7 @@ const TelemetryView = ({ year }) => {
             ...lapNumbers.map((n) => ({ value: n, label: `Lap ${n}` })),
           ]
         : [],
-    [lapNumbers]
+    [lapNumbers],
   );
   const lapSelected = lapOptions.length
     ? lapNumber == null
@@ -130,8 +163,28 @@ const TelemetryView = ({ year }) => {
     : "";
   const lapLabel = lapNumber == null ? "Fastest lap" : `Lap ${lapNumber}`;
 
+  const selectedMeeting = meetings.find((m) => m.meeting_key === meetingKey);
+  const circuitName =
+    selectedMeeting?.circuit_short_name ?? selectedMeeting?.meeting_name ?? "";
+  const gpName = selectedMeeting?.meeting_name ?? "";
+  const sessionName =
+    sessionOptions.find((s) => s.value === sessionKey)?.label ?? "";
+
   const ready = Boolean(sessionKey && driverNumbers.length);
   const hasData = chartData.length > 0;
+
+  const handleDownload = () =>
+    downloadLapSummary(
+      buildLapSummary({
+        gpName,
+        circuitName,
+        sessionName,
+        lapLabel,
+        drivers: enrichedDrivers,
+        chartData,
+        year,
+      }),
+    );
 
   return (
     <>
@@ -159,13 +212,18 @@ const TelemetryView = ({ year }) => {
         <CircularProgress aria-label="Loading telemetry" />
       ) : (
         <>
-          <DriverSummary drivers={telemetryDrivers} />
-          <TrackMap trackMap={trackMap} drivers={telemetryDrivers} />
+          <DriverSummary drivers={enrichedDrivers} />
+          <TrackMap
+            trackMap={trackMap}
+            drivers={enrichedDrivers}
+            circuitName={circuitName}
+          />
           {hasData ? (
             <TelemetryCharts
               chartData={chartData}
-              drivers={telemetryDrivers}
+              drivers={enrichedDrivers}
               lapLabel={lapLabel}
+              onDownload={handleDownload}
             />
           ) : (
             <Text color="secondary" className={styles.message}>

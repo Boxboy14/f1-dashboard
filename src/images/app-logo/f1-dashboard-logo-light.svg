@@ -1,0 +1,22 @@
+<svg width="340" height="48" viewBox="0 0 340 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <line x1="6" y1="4" x2="6" y2="44" stroke="#2a9d9d" stroke-width="2" stroke-linecap="round"></line>
+  
+  <rect x="6" y="4" width="8" height="6" fill="#1a1a22"></rect>
+  <rect x="14" y="4" width="8" height="6" fill="#2a9d9d"></rect>
+  <rect x="22" y="4" width="8" height="6" fill="#1a1a22"></rect>
+  <rect x="6" y="10" width="8" height="6" fill="#2a9d9d"></rect>
+  <rect x="14" y="10" width="8" height="6" fill="#1a1a22"></rect>
+  <rect x="22" y="10" width="8" height="6" fill="#2a9d9d"></rect>
+  <rect x="6" y="16" width="8" height="6" fill="#1a1a22"></rect>
+  <rect x="14" y="16" width="8" height="6" fill="#2a9d9d"></rect>
+  <rect x="22" y="16" width="8" height="6" fill="#1a1a22"></rect>
+  
+  <polyline points="6,36 12,36 15,28 19,42 23,32 26,36 32,36 35,30 38,36" stroke="#c47530" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"></polyline>
+  
+  <circle cx="6" cy="44" r="2" fill="#2a9d9d"></circle>
+  
+  <text x="50" y="30" font-family="&#39;Barlow Condensed&#39;, Arial, sans-serif" font-weight="900" font-size="30" fill="#1a1a22" letter-spacing="-0.5">F1</text>
+  
+  <text x="100" y="30" font-family="&#39;Barlow Condensed&#39;, Arial, sans-serif" font-weight="500" font-size="30" fill="#2a9d9d" letter-spacing="1.5">DASHBOARD</text>
+</svg>

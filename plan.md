@@ -127,11 +127,12 @@ This is the working plan for the F1 Dashboard. Claude Code refers to this when g
 
 **Pending in Phase 1:**
 - Refactor Sidebar to use Salt DS components (`NavigationItem`, `StackLayout`) instead of raw `<aside>`, `<nav>`, `<NavLink>` (Rule 4 in CLAUDE.md).
-- Decide what the disabled `/sessions` sidebar entry should show (standalone recent-sessions list) or remove it.
+- ✅ Resolved (feature 010): the disabled `/sessions` sidebar entry was removed (it won't be built); the `/sessions/:key` detail route reached from Calendar/Overview is unaffected.
 
 ### Phase 2 — Visualizations
 - ✅ Recharts added; telemetry comparison page (`/telemetry`) built — `specs/007-telemetry-comparison/`.
 - ✅ Track map + minisector "fastest where" dominance heatmap (custom SVG from `/location` data) on the telemetry page — `specs/008-track-dominance-map/`.
+- ✅ Telemetry & UI enhancements — `specs/010-telemetry-ui-enhancements/`: downloadable lap-summary PDF (`jspdf`, one button in the chart-stack header), tyre compound on the driver card (from `/stints`), track-map circuit caption + checkered-flag start/finish logo + centered/thicker layout, persisted sidebar collapse toggle (double-chevron), taller/legible charts, and removal of the disabled Sessions sidebar entry.
 - Lap time chart on session detail.
 - Tire strategy timeline (custom SVG).
 - Pace distribution histogram, degradation chart, driver-vs-driver delta.

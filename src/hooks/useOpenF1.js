@@ -680,7 +680,13 @@ function useTelemetryComparison(sessionKey, driverNumbers = [], lapNumber = null
         team_colour: d?.team_colour ?? null,
         slot: i,
         suffix: i === 0 ? "a" : "b",
+        lap_number: slot.lap?.lap_number ?? null,
         lapTime: slot.lap?.lap_duration ?? null,
+        sectors: {
+          s1: slot.lap?.duration_sector_1 ?? null,
+          s2: slot.lap?.duration_sector_2 ?? null,
+          s3: slot.lap?.duration_sector_3 ?? null,
+        },
         topSpeed: null,
       };
       if (!slot.lap) {

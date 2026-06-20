@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Outlet,
   useNavigate,
@@ -13,11 +13,27 @@ import { useDriversByYear } from "../../../hooks/useOpenF1.js";
 import styles from "./DashboardLayout.module.scss";
 
 const DEFAULT_SEASON = 2025;
+const SIDEBAR_KEY = "f1-sidebar-collapsed";
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
   const { driverSlug } = useParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem(SIDEBAR_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIDEBAR_KEY, String(collapsed));
+    } catch {
+      /* localStorage unavailable — collapse just won't persist */
+    }
+  }, [collapsed]);
   const [searchParams, setSearchParams] = useSearchParams();
   const year = Number(searchParams.get("year") ?? DEFAULT_SEASON);
   const { data: drivers = [] } = useDriversByYear(year);
@@ -59,7 +75,12 @@ const DashboardLayout = () => {
         onYearChange={handleYearChange}
       />
       <div className={styles.body}>
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <Sidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          collapsed={collapsed}
+          onToggleCollapse={() => setCollapsed((c) => !c)}
+        />
         <main className={styles.content}>
           <Outlet context={{ openDriverInfo, year }} />
         </main>

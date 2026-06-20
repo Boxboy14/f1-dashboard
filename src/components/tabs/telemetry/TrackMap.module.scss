@@ -1,15 +1,26 @@
 .wrap {
-  margin-top: 16px;
-  max-width: 560px;
+  margin-top: 32px;
+  margin-bottom: 40px;
+  max-width: 640px;
+  margin-inline: auto;
+  text-align: center;
 }
 
 .heading {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 20px;
+}
+
+.circuit {
+  display: block;
+  margin-top: 20px;
+  font-size: var(--fs-section);
+  font-weight: var(--font-weight-semibold);
 }
 
 .legend {
   display: flex;
+  justify-content: center;
   gap: 16px;
   margin-bottom: 8px;
 }
