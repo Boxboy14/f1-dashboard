@@ -2,10 +2,17 @@ import { schedule } from "./rateLimiter.js";
 
 const BASE_URL = "https://api.openf1.org/v1";
 
+// OpenF1 treats repeated instances of the same param as an OR/IN filter
+// (verified live: `?session_key=A&session_key=B` returns rows for both), so
+// an array value fans out to one param per element instead of one request
+// per value — this is what lets the standings-evolution charts fetch every
+// round's data in a single call.
 function buildUrl(endpoint, params = {}) {
   const url = new URL(`${BASE_URL}${endpoint}`);
   Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
+    if (Array.isArray(value)) {
+      value.forEach((v) => url.searchParams.append(key, v));
+    } else if (value !== undefined && value !== null && value !== "") {
       url.searchParams.append(key, value);
     }
   });

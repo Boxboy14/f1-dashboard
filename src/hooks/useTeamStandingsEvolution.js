@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useQueries } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { openF1Api } from "../services/api/openf1.js";
 import { useSessions, useMeetings, useDrivers } from "./useOpenF1.js";
 import { teamColor } from "../components/tabs/teams/standings/standingsColors.js";
@@ -10,9 +10,12 @@ const RACE_STALE = 10 * 60 * 1000;
 // Assembles a season's championship evolution for the Teams-page charts:
 // the ordered race rounds (sprints excluded), each team's colour (resolved
 // via /drivers since /championship_teams has no colour field), and per-round
-// points/position series. Per-round standings are fetched once via useQueries
-// (keyed like useChampionshipTeams, so they dedupe + persist via the app's
-// cache layer); only completed rounds fire.
+// points/position series. All completed rounds' standings are fetched in a
+// single request — OpenF1 treats repeated `session_key` params as an OR
+// filter, so `?session_key=A&session_key=B…` returns every round's rows in
+// one call instead of one request per round (which, fanned out through the
+// 3 req/sec rate limiter, was the reason these charts took several seconds
+// to load).
 export function useTeamStandingsEvolution(year) {
   const { data: sessions = [] } = useSessions({ year, session_type: "Race" });
   const { data: meetings = [] } = useMeetings({ year });
@@ -43,13 +46,27 @@ export function useTeamStandingsEvolution(year) {
     [rounds],
   );
 
-  const standingsQueries = useQueries({
-    queries: completedRounds.map((r) => ({
-      queryKey: ["championship_teams", { session_key: r.sessionKey }],
-      queryFn: () => openF1Api.championshipTeams({ session_key: r.sessionKey }),
-      staleTime: RACE_STALE,
-    })),
+  const sessionKeys = useMemo(
+    () => completedRounds.map((r) => r.sessionKey),
+    [completedRounds],
+  );
+
+  const { data: standingsRows = [], isLoading: isLoadingStandings } = useQuery({
+    queryKey: ["championship_teams_evolution", { session_keys: sessionKeys }],
+    queryFn: () => openF1Api.championshipTeams({ session_key: sessionKeys }),
+    staleTime: RACE_STALE,
+    enabled: sessionKeys.length > 0,
   });
+
+  const standingsBySession = useMemo(() => {
+    const map = new Map();
+    for (const row of standingsRows) {
+      const list = map.get(row.session_key) ?? [];
+      list.push(row);
+      map.set(row.session_key, list);
+    }
+    return map;
+  }, [standingsRows]);
 
   // Team colour (championship_teams has no colour field). Union the first and
   // last completed rounds' driver rosters so a team that fielded a mid-season
@@ -71,12 +88,7 @@ export function useTeamStandingsEvolution(year) {
     return byName;
   }, [firstDrivers, lastDrivers]);
 
-  const isLoading =
-    completedRounds.length > 0 && standingsQueries.some((q) => q.isLoading);
-
-  // Stable primitive dep: changes whenever any round's data lands/refreshes,
-  // without a variable-length deps array when the season changes.
-  const dataSig = standingsQueries.map((q) => q.dataUpdatedAt).join("|");
+  const isLoading = completedRounds.length > 0 && isLoadingStandings;
 
   return useMemo(() => {
     if (completedRounds.length === 0) {
@@ -91,9 +103,9 @@ export function useTeamStandingsEvolution(year) {
       };
     }
 
-    const perRound = completedRounds.map((r, i) => ({
+    const perRound = completedRounds.map((r) => ({
       round: r,
-      standings: standingsQueries[i]?.data ?? [],
+      standings: standingsBySession.get(r.sessionKey) ?? [],
     }));
 
     const teamNames = new Set(colorByTeamName.keys());
@@ -149,6 +161,5 @@ export function useTeamStandingsEvolution(year) {
       isLoading,
       isEmpty: false,
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [completedRounds, colorByTeamName, dataSig, isLoading]);
+  }, [completedRounds, colorByTeamName, standingsBySession, isLoading]);
 }
