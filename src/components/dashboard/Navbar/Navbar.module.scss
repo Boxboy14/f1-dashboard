@@ -41,10 +41,10 @@ $mobile-breakpoint: 768px;
 }
 
 .brand {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  white-space: nowrap;
-  letter-spacing: -0.01em;
+  display: block;
+  height: 30px;
+  width: auto;
+  margin-left: 1rem;
 }
 
 .right {
