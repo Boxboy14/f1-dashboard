@@ -21,9 +21,9 @@ const gridTheme = themeQuartz.withParams({
   browserColorScheme: "inherit",
 });
 
-const DataGrid = ({ rowData, columnDefs, onGridReady, ...rest }) => {
+const DataGrid = ({ rowData, columnDefs, onGridReady, height = "80vh", ...rest }) => {
   return (
-    <div style={{ height: "80vh", width: "100%" }}>
+    <div style={{ height, width: "100%" }}>
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}

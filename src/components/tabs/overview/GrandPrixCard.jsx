@@ -21,6 +21,10 @@ const GrandPrixCard = ({ gp, driversByNumber, onOpenMeeting }) => {
     {
       enabled:
         inView && gp.status === "Completed" && Boolean(gp.raceSessionKey),
+      // Scroll-triggered, one card at a time, with its own "Loading
+      // results…" placeholder — excluded from the global loading overlay so
+      // scrolling the Overview page doesn't repeatedly freeze the screen.
+      meta: { background: true },
     },
   );
 
