@@ -1,4 +1,4 @@
-import { NavLink, useSearchParams } from "react-router-dom";
+import { NavLink, useLocation, useSearchParams } from "react-router-dom";
 import { Button, Tooltip } from "@salt-ds/core";
 import {
   DashboardIcon,
@@ -15,12 +15,21 @@ const NAV_ITEMS = [
   { label: "Overview", icon: DashboardIcon, path: "/overview" },
   { label: "Drivers", icon: UserIcon, path: "/drivers" },
   { label: "Teams", icon: UserGroupIcon, path: "/teams" },
-  { label: "Calendar", icon: CalendarIcon, path: "/seasons" },
+  {
+    label: "Calendar",
+    icon: CalendarIcon,
+    path: "/seasons",
+    match: ["/seasons", "/meetings", "/sessions"],
+  },
   { label: "Telemetry", icon: ChartLineIcon, path: "/telemetry" },
 ];
 
+const isPathActive = (pathname, prefixes) =>
+  prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+
 const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
   const [searchParams] = useSearchParams();
+  const { pathname } = useLocation();
   const year = searchParams.get("year");
 
   return (
@@ -36,20 +45,19 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
           .join(" ")}
       >
         <nav className={styles.nav}>
-          {NAV_ITEMS.map(({ label, icon: Icon, path, disabled }) => {
+          {NAV_ITEMS.map(({ label, icon: Icon, path, disabled, match }) => {
+            const active = isPathActive(pathname, match ?? [path]);
             const link = (
               <NavLink
                 to={{ pathname: path, search: year ? `year=${year}` : "" }}
                 onClick={disabled ? (e) => e.preventDefault() : onClose}
-                className={({ isActive }) =>
-                  [
-                    styles.navItem,
-                    isActive && !disabled ? styles.active : "",
-                    disabled ? styles.disabled : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")
-                }
+                className={[
+                  styles.navItem,
+                  active && !disabled ? styles.active : "",
+                  disabled ? styles.disabled : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
                 tabIndex={disabled ? -1 : undefined}
               >
                 <Icon size={1} className={styles.navIcon} />

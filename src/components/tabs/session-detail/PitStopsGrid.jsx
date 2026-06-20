@@ -108,7 +108,7 @@ function buildViewRows(pitStops, expandedDrivers) {
 
 // ── component ────────────────────────────────────────────────────────────────
 
-const PitStopsGrid = ({ pitStops, isLoading }) => {
+const PitStopsGrid = ({ pitStops, isLoading, height }) => {
   const [expandedDrivers, setExpandedDrivers] = useState(new Set());
 
   const toggleExpanded = useCallback((driverNum) => {
@@ -146,6 +146,7 @@ const PitStopsGrid = ({ pitStops, isLoading }) => {
         rowData={isLoading ? [] : viewRows}
         onGridReady={onGridReady}
         context={context}
+        height={height}
       />
     </div>
   );

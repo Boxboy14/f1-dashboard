@@ -298,6 +298,14 @@ function useSessionDetail(sessionKey) {
     { enabled: Boolean(sessionKey) }
   );
 
+  // The Grand Prix name lives on /meetings, not /sessions — fetched once the
+  // session resolves its meeting_key (dedupes with the meeting-page query).
+  const meetingKey = sessions[0]?.meeting_key;
+  const { data: meetings = [] } = useMeetings(
+    { meeting_key: meetingKey },
+    { enabled: Boolean(meetingKey) }
+  );
+
   const { data: rawResults = [], isLoading: isLoadingResults } = useSessionResult(
     { session_key: sessionKey },
     { enabled: Boolean(sessionKey) }
@@ -374,6 +382,7 @@ function useSessionDetail(sessionKey) {
 
   return {
     session: sessions[0] ?? null,
+    gpName: meetings[0]?.meeting_name ?? "",
     results,
     pitStops,
     isLoading:

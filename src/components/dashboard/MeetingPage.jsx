@@ -38,7 +38,9 @@ const MeetingPage = () => {
       <Button variant="secondary" onClick={goBackToCalendar}>
         ← Back to Calendar
       </Button>
-      <Text styleAs="h1">{meeting.meeting_name}</Text>
+      <Text styleAs="h1">
+        {meeting.year} {meeting.meeting_name}
+      </Text>
       <div className={styles.countryRow}>
         {meeting.country_flag && (
           <img src={meeting.country_flag} alt="" className={styles.countryFlag} />
