@@ -1,0 +1,69 @@
+.panel {
+  --saltCard-padding: 0;
+  position: fixed;
+  bottom: var(--spacing-lg);
+  right: var(--spacing-lg);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  max-width: calc(100vw - 2 * var(--spacing-lg));
+  height: 560px;
+  max-height: calc(100vh - 140px);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-xl);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--salt-container-primary-background);
+}
+
+.title {
+  margin: 0;
+}
+
+.messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  overflow-y: auto;
+}
+
+.empty {
+  margin: auto 0;
+  text-align: center;
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+  background-color: var(--salt-container-primary-background);
+}
+
+.input {
+  flex: 1;
+}
+
+// Phones: anchor to the bottom edge and span the width, but stay short enough
+// that the page behind is never permanently covered (FR-017) — it's dismissible.
+@media (max-width: 600px) {
+  .panel {
+    left: var(--spacing-sm);
+    right: var(--spacing-sm);
+    bottom: var(--spacing-md);
+    width: auto;
+    max-width: none;
+    height: 60vh;
+  }
+}

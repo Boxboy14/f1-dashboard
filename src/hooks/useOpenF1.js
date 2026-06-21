@@ -764,6 +764,7 @@ function useTelemetryComparison(sessionKey, driverNumbers = [], lapNumber = null
 }
 
 export {
+  transformDrivers,
   useDrivers,
   useDriversByYear,
   useSessions,
