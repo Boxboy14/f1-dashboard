@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Button } from "@salt-ds/core";
-import { ChatIcon } from "@salt-ds/icons";
+import { Button, Tooltip } from "@salt-ds/core";
+import fabIcon from "../../images/app-logo/f1-assistant-fab-icon.svg";
 import { useAssistantChat } from "../../hooks/useAssistantChat.js";
 import ChatPanel from "./ChatPanel.jsx";
 import styles from "./AssistantLauncher.module.scss";
@@ -19,15 +19,24 @@ const AssistantLauncher = () => {
   }
 
   return (
-    <Button
-      appearance="solid"
-      sentiment="accented"
-      className={styles.launcher}
-      aria-label="Open F1 assistant"
-      onClick={() => setOpen(true)}
+    <Tooltip
+      content={
+        <span className={styles.tooltipContent}>
+          <span className={styles.tooltipAccent}>F1</span> Dashboard Assistant
+        </span>
+      }
+      placement="left"
+      className={styles.tooltip}
     >
-      <ChatIcon aria-hidden />
-    </Button>
+      <Button
+        appearance="transparent"
+        className={styles.launcher}
+        aria-label="Open F1 assistant"
+        onClick={() => setOpen(true)}
+      >
+        <img src={fabIcon} alt="" className={styles.icon} />
+      </Button>
+    </Tooltip>
   );
 };
 
