@@ -50,6 +50,7 @@ This is the working plan for the F1 Dashboard. Claude Code refers to this when g
 - `/` → redirects to `/drivers`
 - `/drivers` — drivers grid (ag-grid, narrow left column) + season standings charts — Driver Points Evolution and Driver Ranking Evolution (Recharts, team-coloured, flag X-axis, per-round hover) — `specs/011-drivers-standings-charts/`
 - `/drivers/:slug` — driver detail card (opened from grid row or search)
+- `/feedback` — feedback form (Name, Email, Feedback) delivered to the owner's email via EmailJS (`@emailjs/browser`, client-only, no backend); entry point pinned to the bottom of the sidebar. EmailJS IDs in `VITE_EMAILJS_*` env vars; the send is a TanStack `useMutation` (not counted by the global loading overlay) — `specs/012-feedback-form/`
 
 ### Planned
 
