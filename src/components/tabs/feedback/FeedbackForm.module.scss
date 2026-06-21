@@ -1,0 +1,70 @@
+.card {
+  --saltCard-padding: 0;
+  max-width: 560px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-top: 3px solid var(--color-accent);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 40px 32px;
+
+  // Salt shows a blue focus outline on Input/MultilineInput when clicked.
+  // --saltInput-outline is Salt's own override hook for this; MultilineInput
+  // has no such hook, so its outline color token is overridden directly.
+  :global(.saltInput-primary) {
+    --saltInput-outline: none;
+  }
+
+  :global(.saltMultilineInput-primary) {
+    --multilineInput-outlineColor: transparent;
+  }
+}
+
+.label {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+}
+
+.submit {
+  align-self: stretch;
+  min-height: 44px;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: transform var(--transition-fast);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+.messageFooter {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.charCount {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+// Visually hidden but still in the DOM/tab order off-screen so bots fill it.
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
