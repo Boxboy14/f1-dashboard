@@ -10,6 +10,7 @@ import TelemetryPage from "./components/dashboard/TelemetryPage.jsx";
 import FeedbackPage from "./components/dashboard/FeedbackPage.jsx";
 import DashboardLayout from "./components/dashboard/layouts/DashboardLayout.jsx";
 import GlobalLoadingOverlay from "./components/common/GlobalLoadingOverlay.jsx";
+import AssistantLauncher from "./components/assistant/AssistantLauncher.jsx";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         </Route>
       </Routes>
       <GlobalLoadingOverlay />
+      <AssistantLauncher />
     </>
   );
 }

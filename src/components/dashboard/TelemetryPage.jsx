@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useMemo, useCallback, useEffect, useRef } from "react";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 import { CircularProgress, Text } from "@salt-ds/core";
 import {
   useRaceCalendar,
@@ -11,24 +11,20 @@ import {
 import { compoundForLap, tyreAgeForLap } from "../../utils/telemetry/tyres.js";
 import { buildLapSummary } from "../../utils/telemetry/lapSummary.js";
 import { downloadLapSummary } from "../../utils/telemetry/lapSummaryPdf.js";
+import {
+  readTelemetrySelection,
+  writeTelemetrySelection,
+} from "../../utils/telemetry/selectionStorage.js";
+import {
+  applySelectionToParams,
+  hasSelectionParams,
+  parseSelectionParams,
+} from "../../utils/telemetry/selectionParams.js";
 import TelemetryControls from "../tabs/telemetry/TelemetryControls.jsx";
 import DriverSummary from "../tabs/telemetry/DriverSummary.jsx";
 import TrackMap from "../tabs/telemetry/TrackMap.jsx";
 import TelemetryCharts from "../tabs/telemetry/TelemetryCharts.jsx";
 import styles from "./TelemetryPage.module.scss";
-
-// Selections persist for the session (survive refresh + tab navigation), keyed
-// by year so they only restore for the matching season. sessionStorage clears
-// when the tab/app closes — exactly when we want the telemetry forgotten.
-const STORAGE_KEY = "telemetry-selection";
-const readStored = (year) => {
-  try {
-    const parsed = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "null");
-    return parsed && parsed.year === year ? parsed : null;
-  } catch {
-    return null;
-  }
-};
 
 // Keyed by year: changing the navbar season remounts the view, which resets
 // every selection (dropdowns + charts) to the start — the React-idiomatic reset.
@@ -38,34 +34,38 @@ const TelemetryPage = () => {
 };
 
 const TelemetryView = ({ year }) => {
-  const [meetingKey, setMeetingKey] = useState(
-    () => readStored(year)?.meetingKey ?? null,
-  );
-  const [sessionKey, setSessionKey] = useState(
-    () => readStored(year)?.sessionKey ?? null,
-  );
-  const [driverNumbers, setDriverNumbers] = useState(
-    () => readStored(year)?.driverNumbers ?? [],
-  );
-  const [lapNumber, setLapNumber] = useState(
-    () => readStored(year)?.lapNumber ?? null,
-  ); // null = fastest lap
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  // The URL is the source of truth for the selection (CLAUDE.md routing rule).
+  // Deriving it every render — rather than from once-on-mount state — means a
+  // link that changes the params (e.g. the assistant's "open the telemetry
+  // comparison" link for a freshly built report) updates the view immediately,
+  // even when we're already on this page at the same season and the year remount
+  // key hasn't changed.
+  const { meetingKey, sessionKey, driverNumbers, lapNumber } = useMemo(
+    () => parseSelectionParams(searchParams),
+    [searchParams],
+  );
+
+  // On first mount with an empty URL, seed it from the last selection saved for
+  // this year so a refresh or tab-return isn't blank. A populated URL always
+  // wins, so a deep link is never overridden.
+  const didRestore = useRef(false);
   useEffect(() => {
-    try {
-      sessionStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          year,
-          meetingKey,
-          sessionKey,
-          driverNumbers,
-          lapNumber,
-        }),
-      );
-    } catch {
-      /* sessionStorage unavailable — selections just won't persist */
-    }
+    if (didRestore.current) return;
+    didRestore.current = true;
+    if (hasSelectionParams(searchParams)) return;
+    const stored = readTelemetrySelection(year);
+    if (stored?.meetingKey || stored?.driverNumbers?.length)
+      setSearchParams((prev) => applySelectionToParams(prev, stored), {
+        replace: true,
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist for cross-session restore; the URL already covers in-session nav.
+  useEffect(() => {
+    writeTelemetrySelection({ year, meetingKey, sessionKey, driverNumbers, lapNumber });
   }, [year, meetingKey, sessionKey, driverNumbers, lapNumber]);
 
   const { data: meetings = [] } = useRaceCalendar(year);
@@ -102,21 +102,35 @@ const TelemetryView = ({ year }) => {
     [drivers],
   );
 
-  const onEventChange = useCallback((value) => {
-    setMeetingKey(value);
-    setSessionKey(null);
-    setDriverNumbers([]);
-    setLapNumber(null);
-  }, []);
-  const onSessionChange = useCallback((value) => {
-    setSessionKey(value);
-    setDriverNumbers([]);
-    setLapNumber(null);
-  }, []);
-  const onDriversChange = useCallback((value) => setDriverNumbers(value), []);
+  // All selection edits flow through the URL. Reading the previous params inside
+  // the updater keeps the unchanged fields intact without stale-closure risk.
+  const patchSelection = useCallback(
+    (patch) =>
+      setSearchParams(
+        (prev) =>
+          applySelectionToParams(prev, { ...parseSelectionParams(prev), ...patch }),
+        { replace: true },
+      ),
+    [setSearchParams],
+  );
+
+  // Changing event/session resets the dependent selections downstream.
+  const onEventChange = useCallback(
+    (value) =>
+      patchSelection({ meetingKey: value, sessionKey: null, driverNumbers: [], lapNumber: null }),
+    [patchSelection],
+  );
+  const onSessionChange = useCallback(
+    (value) => patchSelection({ sessionKey: value, driverNumbers: [], lapNumber: null }),
+    [patchSelection],
+  );
+  const onDriversChange = useCallback(
+    (value) => patchSelection({ driverNumbers: value }),
+    [patchSelection],
+  );
   const onLapChange = useCallback(
-    (value) => setLapNumber(value === "fastest" ? null : Number(value)),
-    [],
+    (value) => patchSelection({ lapNumber: value === "fastest" ? null : Number(value) }),
+    [patchSelection],
   );
 
   const {
