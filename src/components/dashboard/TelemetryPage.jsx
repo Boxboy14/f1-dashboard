@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 import { CircularProgress, Text } from "@salt-ds/core";
 import {
   useRaceCalendar,
@@ -11,7 +11,15 @@ import {
 import { compoundForLap, tyreAgeForLap } from "../../utils/telemetry/tyres.js";
 import { buildLapSummary } from "../../utils/telemetry/lapSummary.js";
 import { downloadLapSummary } from "../../utils/telemetry/lapSummaryPdf.js";
-import { readTelemetrySelection, writeTelemetrySelection } from "../../utils/telemetry/selectionStorage.js";
+import {
+  readTelemetrySelection,
+  writeTelemetrySelection,
+} from "../../utils/telemetry/selectionStorage.js";
+import {
+  applySelectionToParams,
+  hasSelectionParams,
+  parseSelectionParams,
+} from "../../utils/telemetry/selectionParams.js";
 import TelemetryControls from "../tabs/telemetry/TelemetryControls.jsx";
 import DriverSummary from "../tabs/telemetry/DriverSummary.jsx";
 import TrackMap from "../tabs/telemetry/TrackMap.jsx";
@@ -33,21 +41,42 @@ const TelemetryPage = () => {
 };
 
 const TelemetryView = ({ year }) => {
-  const [meetingKey, setMeetingKey] = useState(
-    () => readStored(year)?.meetingKey ?? null,
-  );
-  const [sessionKey, setSessionKey] = useState(
-    () => readStored(year)?.sessionKey ?? null,
-  );
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const initialRef = useRef(null);
+  if (initialRef.current === null) {
+    initialRef.current = hasSelectionParams(searchParams)
+      ? parseSelectionParams(searchParams)
+      : (readStored(year) ?? {});
+  }
+  const initial = initialRef.current;
+
+  const [meetingKey, setMeetingKey] = useState(initial.meetingKey ?? null);
+  const [sessionKey, setSessionKey] = useState(initial.sessionKey ?? null);
   const [driverNumbers, setDriverNumbers] = useState(
-    () => readStored(year)?.driverNumbers ?? [],
+    initial.driverNumbers ?? [],
   );
-  const [lapNumber, setLapNumber] = useState(
-    () => readStored(year)?.lapNumber ?? null,
-  ); // null = fastest lap
+  const [lapNumber, setLapNumber] = useState(initial.lapNumber ?? null); // null = fastest lap
 
   useEffect(() => {
-    writeTelemetrySelection({ year, meetingKey, sessionKey, driverNumbers, lapNumber });
+    writeTelemetrySelection({
+      year,
+      meetingKey,
+      sessionKey,
+      driverNumbers,
+      lapNumber,
+    });
+    setSearchParams(
+      (prev) =>
+        applySelectionToParams(prev, {
+          meetingKey,
+          sessionKey,
+          driverNumbers,
+          lapNumber,
+        }),
+      { replace: true },
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [year, meetingKey, sessionKey, driverNumbers, lapNumber]);
 
   const { data: meetings = [] } = useRaceCalendar(year);
