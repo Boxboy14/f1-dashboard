@@ -18,21 +18,29 @@ function getClient() {
   return client;
 }
 
+const SERVICE_UNAVAILABLE_MESSAGE =
+  "Sorry, I can't process your request right now. Please try again after some time.";
+
 export async function* streamTurn({ history, tools, systemInstruction }) {
   const ai = getClient();
 
   const config = { systemInstruction };
   if (tools?.length) config.tools = [{ functionDeclarations: tools }];
 
-  const stream = await ai.models.generateContentStream({
-    model: GEMINI_MODEL,
-    contents: history,
-    config,
-  });
+  try {
+    const stream = await ai.models.generateContentStream({
+      model: GEMINI_MODEL,
+      contents: history,
+      config,
+    });
 
-  for await (const chunk of stream) {
-    const text = chunk.text ?? "";
-    const functionCalls = chunk.functionCalls ?? [];
-    if (text || functionCalls.length) yield { text, functionCalls };
+    for await (const chunk of stream) {
+      const text = chunk.text ?? "";
+      const functionCalls = chunk.functionCalls ?? [];
+      if (text || functionCalls.length) yield { text, functionCalls };
+    }
+  } catch (err) {
+    console.error("Gemini request failed:", err);
+    throw new Error(SERVICE_UNAVAILABLE_MESSAGE);
   }
 }

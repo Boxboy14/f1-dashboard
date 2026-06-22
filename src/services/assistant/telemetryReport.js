@@ -8,6 +8,7 @@ import { deriveDistance, resampleToGrid, mergeDrivers } from "../../utils/teleme
 import { compoundForLap, tyreAgeForLap } from "../../utils/telemetry/tyres.js";
 import { buildLapSummary } from "../../utils/telemetry/lapSummary.js";
 import { downloadLapSummary } from "../../utils/telemetry/lapSummaryPdf.js";
+import { writeTelemetrySelection } from "../../utils/telemetry/selectionStorage.js";
 import { f1Fetch, matchDriver, resolveSession } from "./f1Resolvers.js";
 
 const TELEMETRY_GRID_POINTS = 400; // matches useOpenF1's telemetry resolution
@@ -109,6 +110,17 @@ export async function buildAndDownloadReport({ queryClient, year, grandPrix, ses
       year,
     }),
   );
+
+  // Hand the resolved selection to the Telemetry page via the same sessionStorage
+  // contract it reads on mount, so the assistant's "open the comparison" link
+  // lands on a pre-filled page instead of empty dropdowns.
+  writeTelemetrySelection({
+    year,
+    meetingKey: meeting.meeting_key,
+    sessionKey: sess.session_key,
+    driverNumbers: resolved.map((d) => d.driver_number),
+    lapNumber: lap == null || lap === "fastest" ? null : Number(lap),
+  });
 
   const names = reportDrivers.map((d) => d.name).join(" vs ");
   return {

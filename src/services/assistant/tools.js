@@ -281,7 +281,9 @@ async function download_telemetry_report(args, { queryClient }) {
     drivers,
     lap,
   });
-  return result.ok ? { ...result, page: "/telemetry", pageLabel: "Open the telemetry comparison" } : result;
+  return result.ok
+    ? { ...result, page: `/telemetry?year=${year}`, pageLabel: "Open the telemetry comparison" }
+    : result;
 }
 
 const YEAR_PARAM = {

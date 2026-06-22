@@ -11,6 +11,7 @@ import {
 import { compoundForLap, tyreAgeForLap } from "../../utils/telemetry/tyres.js";
 import { buildLapSummary } from "../../utils/telemetry/lapSummary.js";
 import { downloadLapSummary } from "../../utils/telemetry/lapSummaryPdf.js";
+import { readTelemetrySelection, writeTelemetrySelection } from "../../utils/telemetry/selectionStorage.js";
 import TelemetryControls from "../tabs/telemetry/TelemetryControls.jsx";
 import DriverSummary from "../tabs/telemetry/DriverSummary.jsx";
 import TrackMap from "../tabs/telemetry/TrackMap.jsx";
@@ -18,17 +19,11 @@ import TelemetryCharts from "../tabs/telemetry/TelemetryCharts.jsx";
 import styles from "./TelemetryPage.module.scss";
 
 // Selections persist for the session (survive refresh + tab navigation), keyed
-// by year so they only restore for the matching season. sessionStorage clears
-// when the tab/app closes — exactly when we want the telemetry forgotten.
-const STORAGE_KEY = "telemetry-selection";
-const readStored = (year) => {
-  try {
-    const parsed = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "null");
-    return parsed && parsed.year === year ? parsed : null;
-  } catch {
-    return null;
-  }
-};
+// by year so they only restore for the matching season — and so the assistant's
+// "open the telemetry comparison" link can hand off a pre-filled selection
+// instead of empty dropdowns. sessionStorage clears when the tab/app closes —
+// exactly when we want the telemetry forgotten.
+const readStored = readTelemetrySelection;
 
 // Keyed by year: changing the navbar season remounts the view, which resets
 // every selection (dropdowns + charts) to the start — the React-idiomatic reset.
@@ -52,20 +47,7 @@ const TelemetryView = ({ year }) => {
   ); // null = fastest lap
 
   useEffect(() => {
-    try {
-      sessionStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          year,
-          meetingKey,
-          sessionKey,
-          driverNumbers,
-          lapNumber,
-        }),
-      );
-    } catch {
-      /* sessionStorage unavailable — selections just won't persist */
-    }
+    writeTelemetrySelection({ year, meetingKey, sessionKey, driverNumbers, lapNumber });
   }, [year, meetingKey, sessionKey, driverNumbers, lapNumber]);
 
   const { data: meetings = [] } = useRaceCalendar(year);
