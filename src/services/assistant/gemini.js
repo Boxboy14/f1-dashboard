@@ -4,8 +4,7 @@
 // tier the worst case of a leak is rate-limit abuse, not cost.
 import { GoogleGenAI } from "@google/genai";
 
-// Current free-tier Flash model — confirm the exact id in Google AI Studio.
-export const GEMINI_MODEL = "gemini-2.5-flash";
+export const GEMINI_MODEL = "gemini-3.1-flash-lite";
 
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -36,8 +35,9 @@ export async function* streamTurn({ history, tools, systemInstruction }) {
 
     for await (const chunk of stream) {
       const text = chunk.text ?? "";
-      const functionCalls = chunk.functionCalls ?? [];
-      if (text || functionCalls.length) yield { text, functionCalls };
+      const parts = chunk.candidates?.[0]?.content?.parts ?? [];
+      const functionCallParts = parts.filter((p) => p.functionCall);
+      if (text || functionCallParts.length) yield { text, functionCallParts };
     }
   } catch (err) {
     console.error("Gemini request failed:", err);

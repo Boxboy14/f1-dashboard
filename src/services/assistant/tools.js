@@ -9,6 +9,7 @@
 // apologise for (FR-015). Every successful data result includes a `page` route
 // (+ `pageLabel`) so the UI can link to the matching app page (FR-009).
 import { createDriverSlug } from "../../store/drivers/utils.js";
+import { applySelectionToParams } from "../../utils/telemetry/selectionParams.js";
 import { f1Fetch, matchDriver, resolveSession } from "./f1Resolvers.js";
 import { buildAndDownloadReport } from "./telemetryReport.js";
 
@@ -281,9 +282,15 @@ async function download_telemetry_report(args, { queryClient }) {
     drivers,
     lap,
   });
-  return result.ok
-    ? { ...result, page: `/telemetry?year=${year}`, pageLabel: "Open the telemetry comparison" }
-    : result;
+  if (!result.ok) return result;
+  // Encode the exact selection into the link so it deep-links to these drivers
+  // even when the Telemetry page is already open on the same season (no remount).
+  const { selection, ...rest } = result;
+  const params = applySelectionToParams(
+    new URLSearchParams({ year: String(year) }),
+    selection,
+  );
+  return { ...rest, page: `/telemetry?${params.toString()}`, pageLabel: "Open the telemetry comparison" };
 }
 
 const YEAR_PARAM = {

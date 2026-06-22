@@ -79,7 +79,7 @@ export function useAssistantChat() {
         let answer = "";
         for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
           let roundText = "";
-          const calls = [];
+          const callParts = [];
 
           for await (const chunk of streamTurn({
             history,
@@ -90,19 +90,21 @@ export function useAssistantChat() {
               roundText += chunk.text;
               updateMessage(assistantId, { text: roundText, links: pageLinks });
             }
-            if (chunk.functionCalls.length) calls.push(...chunk.functionCalls);
+            if (chunk.functionCallParts.length) callParts.push(...chunk.functionCallParts);
           }
 
-          if (!calls.length) {
+          if (!callParts.length) {
             answer = roundText;
             break;
           }
 
-          // The model wants data: record its tool turn, run each handler, then
-          // feed the results back as a single function-response turn.
-          history.push({ role: "model", parts: calls.map((fc) => ({ functionCall: fc })) });
+          // The model wants data: record its tool turn (the function-call parts
+          // verbatim, so Gemini 3's thoughtSignature is preserved — see
+          // gemini.js), run each handler, then feed the results back as a single
+          // function-response turn.
+          history.push({ role: "model", parts: callParts });
           const responseParts = [];
-          for (const call of calls) {
+          for (const { functionCall: call } of callParts) {
             const handler = handlers[call.name];
             let result;
             try {

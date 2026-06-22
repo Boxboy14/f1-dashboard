@@ -111,20 +111,22 @@ export async function buildAndDownloadReport({ queryClient, year, grandPrix, ses
     }),
   );
 
-  // Hand the resolved selection to the Telemetry page via the same sessionStorage
-  // contract it reads on mount, so the assistant's "open the comparison" link
-  // lands on a pre-filled page instead of empty dropdowns.
-  writeTelemetrySelection({
+  const selection = {
     year,
     meetingKey: meeting.meeting_key,
     sessionKey: sess.session_key,
     driverNumbers: resolved.map((d) => d.driver_number),
     lapNumber: lap == null || lap === "fastest" ? null : Number(lap),
-  });
+  };
+  // Persist it (a bare /telemetry visit restores the last selection from here),
+  // and return it so the tool can build a fully-qualified deep link that selects
+  // these exact drivers regardless of what the page was previously showing.
+  writeTelemetrySelection(selection);
 
   const names = reportDrivers.map((d) => d.name).join(" vs ");
   return {
     ok: true,
     summary: `${names} — ${year} ${meeting.meeting_name} ${sess.session_name}, ${lapLabel}`,
+    selection,
   };
 }
