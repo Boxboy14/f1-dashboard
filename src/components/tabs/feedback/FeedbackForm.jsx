@@ -18,7 +18,6 @@ const NAME_MAX = 80;
 const MESSAGE_MAX = 5000;
 const SUCCESS_RESET_DELAY = 3000;
 
-// Validates trimmed values so whitespace-only fields count as empty.
 function validate({ name, email, message }) {
   const errors = {};
   const n = name.trim();
@@ -63,7 +62,7 @@ const FeedbackForm = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (honeypot) return; // bot trap — silently drop automated submissions
+    if (honeypot) return;
 
     const nextErrors = validate({ name, email, message });
     setErrors(nextErrors);
@@ -153,7 +152,6 @@ const FeedbackForm = () => {
           </div>
         </FormField>
 
-        {/* Honeypot: hidden from real users; bots that fill it get silently dropped. */}
         <input
           className={styles.honeypot}
           type="text"

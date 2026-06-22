@@ -1,15 +1,10 @@
-// Renders a LapSummaryReport (see lapSummary.js) to a PDF and triggers its
-// download. jsPDF is a stateful cursor on the page: we track `y` ourselves,
-// wrap paragraphs with splitTextToSize, and addPage() before overflowing.
 import { jsPDF } from "jspdf";
 
-const MARGIN = 16; // mm
-const LINE = 6; // mm per text line
+const MARGIN = 16;
+const LINE = 6;
 const sanitize = (s) =>
   (s || "report").replace(/[^a-z0-9]+/gi, "-").toLowerCase();
 
-// jsPDF can't resolve CSS vars, so the tyre badge colours are concrete RGB
-// triples (not hex) — matching the in-app TyreIcon palette.
 const TYRE_RGB = {
   SOFT: [214, 40, 40],
   MEDIUM: [240, 200, 8],
@@ -21,7 +16,7 @@ const TYRE_DARK_LETTER = new Set(["MEDIUM", "HARD"]);
 const fmtSector = (s) => (s == null ? "–" : s.toFixed(3));
 
 export function downloadLapSummary(report) {
-  const doc = new jsPDF(); // A4 portrait, mm
+  const doc = new jsPDF();
   const pageHeight = doc.internal.pageSize.getHeight();
   const pageWidth = doc.internal.pageSize.getWidth();
   const maxWidth = pageWidth - MARGIN * 2;
@@ -42,7 +37,6 @@ export function downloadLapSummary(report) {
     y += LINE * lines.length + (gap - LINE);
   };
 
-  // "Tyre: ● Soft" — a small filled compound badge between label and name.
   const writeTyreRow = (d) => {
     ensureSpace(1);
     doc.setFont("helvetica", "normal");
@@ -73,7 +67,6 @@ export function downloadLapSummary(report) {
     y += LINE;
   };
 
-  // Title (parts joined by a centered bullet) + "Summary of …" subheader below.
   const titleParts = [
     `${report.year} ${report.gpName}`,
     report.circuitName,
@@ -83,7 +76,6 @@ export function downloadLapSummary(report) {
   write(`Summary of ${report.lapLabel}`, { size: 12, gap: LINE });
   y += 2;
 
-  // Per-driver blocks
   report.drivers.forEach((d) => {
     const lap = d.lapNumber != null ? `Lap ${d.lapNumber}` : report.lapLabel;
     write(`Driver #${d.driver_number} ${d.name} — ${lap}`, {

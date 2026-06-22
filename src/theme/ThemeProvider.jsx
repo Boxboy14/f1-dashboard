@@ -16,15 +16,13 @@ const getInitialTheme = () => {
 const ThemeProvider = ({ children }) => {
   const [theme, setThemeState] = useState(getInitialTheme);
 
-  // Mirror the theme onto <html data-theme> + color-scheme (so native controls,
-  // scrollbars, and the ag-grid "inherit" scheme follow it) and persist it.
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
     try {
       localStorage.setItem(STORAGE_KEY, theme);
+      // eslint-disable-next-line no-empty
     } catch {
-      /* storage unavailable — the theme just won't persist */
     }
   }, [theme]);
 

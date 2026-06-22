@@ -11,13 +11,9 @@ import { Text } from "@salt-ds/core";
 import FlagAxisTick from "./FlagAxisTick.jsx";
 import styles from "./DriverStandingsCharts.module.scss";
 
-// Axis/grid are themed by the global Recharts CSS (index.css); tooltip surface
-// uses Salt token strings (var() resolves in inline style / CSS).
 const TOOLTIP_BG = "var(--salt-container-primary-background)";
 const TOOLTIP_BORDER = "var(--salt-separable-secondary-borderColor)";
 
-// Hovering a round → every driver's cumulative points that round, ranked
-// high→low (ties broken by championship order, which `drivers` is sorted by).
 const PointsTooltip = ({ active, payload, label, rounds, drivers }) => {
   if (!active || !payload?.length) return null;
   const round = rounds.find((r) => r.round === label);

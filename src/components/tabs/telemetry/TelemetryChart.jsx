@@ -11,8 +11,6 @@ import { DRIVER_COLOR_VARS } from "./channels.js";
 import { cssColor } from "../../../theme/cssColor.js";
 import styles from "./TelemetryChart.module.scss";
 
-// Axis lines, grid, and tick labels are themed via global CSS (see index.css),
-// since Recharts sets those as SVG attributes that don't resolve var().
 const LABEL_FILL = "var(--salt-content-secondary-foreground)";
 const TOOLTIP_BG = "var(--salt-container-primary-background)";
 const TOOLTIP_BORDER = "var(--salt-separable-secondary-borderColor)";
@@ -24,9 +22,6 @@ const TelemetryChart = ({ channel, data, drivers, lapLabel }) => {
     ? `${channel.label} (${channel.unit})`
     : channel.label;
 
-  // Tooltip value: DRS reads On/Off; "%" hugs the number (kept as-is); every
-  // other metric is rounded up to a whole number (decimals are noise here),
-  // then suffixed — "300 km/h", "11500 RPM", or the bare number (gear).
   const formatValue = (value) => {
     if (value == null) return value;
     if (channel.key === "drs") return Number(value) >= 1 ? "On" : "Off";

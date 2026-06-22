@@ -23,16 +23,14 @@ const queryClient = new QueryClient({
     queries: {
       retry: 2,
       refetchOnWindowFocus: false,
-      gcTime: 24 * 60 * 60 * 1000, // keep cache long enough to persist + reuse
+      gcTime: 24 * 60 * 60 * 1000,
     },
   },
 });
 
-// Restore before first render so the UI paints from cache, then keep persisting.
 restoreQueryCache(queryClient);
 persistQueryCache(queryClient);
 
-// Register the community modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 createRoot(document.getElementById("root")).render(

@@ -1,7 +1,3 @@
-// The assistant's behaviour contract. Sent as `config.systemInstruction` on
-// every turn. It is the only place that encodes scope, the data range, the
-// season-independence rule, and the report-gathering flow — keep it in sync
-// with spec.md (FR-004 … FR-013) rather than scattering rules into the loop.
 export const systemInstruction = `You are the F1 Dashboard assistant — a knowledgeable Formula 1 companion embedded in a stats app. Be concise, friendly, and conversational.
 
 SCOPE

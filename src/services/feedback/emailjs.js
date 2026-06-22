@@ -13,7 +13,6 @@ export async function sendFeedback({ name, email, message }) {
     );
   }
 
-  // Keys map to {{user_name}}, {{user_email}}, {{message}} in the EmailJS template.
   const templateParams = {
     name,
     email,

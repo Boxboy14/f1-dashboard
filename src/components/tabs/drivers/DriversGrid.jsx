@@ -5,7 +5,6 @@ import styles from "./DriversGrid.module.scss";
 const columnDefs = [
   { headerName: "Driver Name", field: "full_name", sortable: true },
   { headerName: "Driver Number", field: "driver_number", sortable: true },
-  //   { headerName: "Nationality", field: "country_name", sortable: true },
   { headerName: "Constructor", field: "team_name", sortable: true },
 ];
 

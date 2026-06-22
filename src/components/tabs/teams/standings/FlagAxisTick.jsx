@@ -1,6 +1,3 @@
-// Recharts custom X-axis tick: renders the round's country flag as a small
-// centered image under the tick. `rounds` maps the round number (the X datum)
-// to its flag URL.
 const FLAG_W = 20;
 const FLAG_H = 13;
 

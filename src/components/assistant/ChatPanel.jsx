@@ -4,17 +4,11 @@ import { CloseIcon, SendIcon } from "@salt-ds/icons";
 import ChatMessage from "./ChatMessage.jsx";
 import styles from "./ChatPanel.module.scss";
 
-// Presentational chat window. The conversation state is owned by
-// AssistantLauncher and passed in as `chat` so it survives dismissal (the panel
-// unmounts but the hook stays alive in the launcher). Errors surface inside the
-// message list as an error bubble, so the conversation is preserved for retry
-// (FR-015) without a separate banner.
 const ChatPanel = ({ chat, onDismiss }) => {
   const { messages, isStreaming, sendMessage } = chat;
   const [draft, setDraft] = useState("");
   const listRef = useRef(null);
 
-  // Keep the latest message in view as it streams and as new turns arrive.
   useEffect(() => {
     const el = listRef.current;
     if (el) el.scrollTop = el.scrollHeight;
@@ -27,7 +21,6 @@ const ChatPanel = ({ chat, onDismiss }) => {
     setDraft("");
   };
 
-  // Enter sends; Shift+Enter inserts a newline.
   const onKeyDown = (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();

@@ -1,12 +1,7 @@
 import { dehydrate, hydrate } from "@tanstack/react-query";
 
-// Historical F1 data never changes, so we persist successful query results to
-// localStorage and restore them on startup. Reloads then paint instantly from
-// cache instead of re-hitting the rate-limited OpenF1 API. Built on the core
-// dehydrate/hydrate helpers — no extra dependency.
-
 const KEY = "f1-dashboard-query-cache-v1";
-const MAX_AGE = 24 * 60 * 60 * 1000; // 24h
+const MAX_AGE = 24 * 60 * 60 * 1000;
 
 function restoreQueryCache(queryClient) {
   try {
@@ -31,11 +26,10 @@ function persistQueryCache(queryClient) {
         shouldDehydrateQuery: (query) => query.state.status === "success",
       });
       localStorage.setItem(KEY, JSON.stringify({ timestamp: Date.now(), state }));
+      // eslint-disable-next-line no-empty
     } catch {
-      // localStorage full or value not serialisable — skip this write
     }
   };
-  // Debounce: a page load settles many queries in quick succession.
   queryClient.getQueryCache().subscribe(() => {
     clearTimeout(timeout);
     timeout = setTimeout(write, 1000);

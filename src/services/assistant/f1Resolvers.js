@@ -1,8 +1,3 @@
-// Turns the loose names a user types ("Monaco", "quali", "Verstappen") into the
-// keys/numbers OpenF1 needs. Every fetch goes through queryClient.fetchQuery
-// over openF1Api so it shares the pages' TanStack cache, is paced by the rate
-// limiter, and is tagged meta:{ background: true } so the GlobalLoadingOverlay
-// never counts assistant traffic (Constitution Article IV; research.md §5).
 import { openF1Api } from "../api/openf1.js";
 import { transformDrivers } from "../../hooks/useOpenF1.js";
 
@@ -17,9 +12,6 @@ function fetchQ(queryClient, queryKey, queryFn, staleTime) {
   });
 }
 
-// Query keys mirror useOpenF1.js exactly so a page and the assistant share one
-// cache entry (never the same call from two places). The drivers fetch reuses
-// the hook's transform so the cached shape stays identical for both readers.
 export const f1Fetch = {
   meetings: (qc, year) =>
     fetchQ(qc, ["meetings", { year }], () => openF1Api.meetings({ year }), STALE.long),
@@ -44,8 +36,6 @@ export const f1Fetch = {
     fetchQ(qc, ["pit", { session_key }], () => openF1Api.pit({ session_key }), STALE.short),
   laps: (qc, session_key, driver_number) =>
     fetchQ(qc, ["laps", { session_key, driver_number }], () => openF1Api.laps({ session_key, driver_number }), STALE.short),
-  // Whole-session laps in one request (distinct key from the per-driver fetch);
-  // used to find a session's fastest lap without 20 per-driver calls.
   lapsBySession: (qc, session_key) =>
     fetchQ(qc, ["laps", { session_key }], () => openF1Api.laps({ session_key }), STALE.short),
   stints: (qc, session_key) =>
@@ -54,7 +44,6 @@ export const f1Fetch = {
     fetchQ(qc, ["car_data_lap", params], () => openF1Api.carDataLap(params), STALE.lap),
 };
 
-// "Monaco Grand Prix" / "GP" noise removed, punctuation flattened, lowercased.
 const STOPWORDS = /\b(grand prix|grandprix|gp)\b/g;
 const normalize = (s) =>
   (s ?? "")
@@ -65,7 +54,6 @@ const normalize = (s) =>
     .replace(/\s+/g, " ")
     .trim();
 
-// Score each meeting's searchable fields against the query; best match wins.
 function matchMeeting(meetings, grandPrix) {
   const q = normalize(grandPrix);
   if (!q || !meetings?.length) return null;
@@ -138,7 +126,6 @@ function matchSession(sessions, sessionName) {
   );
 }
 
-// `query` may be a number, a "#44", an acronym (VER), a surname, or a full name.
 export function matchDriver(drivers, query) {
   if (query == null || !drivers?.length) return null;
   const raw = String(query).trim().replace(/^#/, "");
@@ -160,9 +147,6 @@ export function matchDriver(drivers, query) {
   );
 }
 
-// Resolve a Grand Prix to its meeting, then to one of its sessions (default
-// Race). Returns { meeting, session } with either field null when unresolved so
-// callers can report exactly which part failed.
 export async function resolveSession(queryClient, { year, grandPrix, session = "Race" }) {
   const meetings = await f1Fetch.meetings(queryClient, year);
   const meeting = matchMeeting(meetings, grandPrix);

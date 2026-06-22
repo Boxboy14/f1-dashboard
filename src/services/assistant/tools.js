@@ -1,13 +1,3 @@
-// Registry of Gemini function declarations and their handlers. Declarations are
-// plain JSON objects whose `type` strings match the SDK's Type enum, so this
-// module needs no @google/genai import — the SDK boundary stays in gemini.js.
-//
-// Each handler is `async (args, { queryClient }) => result` returning plain JSON
-// (no React, no hooks). On an expected data gap a handler returns
-// `{ ok: false, problem }` rather than throwing; network/parse failures throw
-// and the send loop turns them into a functionResponse error the model can
-// apologise for (FR-015). Every successful data result includes a `page` route
-// (+ `pageLabel`) so the UI can link to the matching app page (FR-009).
 import { createDriverSlug } from "../../store/drivers/utils.js";
 import { applySelectionToParams } from "../../utils/telemetry/selectionParams.js";
 import { f1Fetch, matchDriver, resolveSession } from "./f1Resolvers.js";
@@ -18,8 +8,6 @@ const driverIndex = (drivers) =>
 const nameOf = (idx, number) => idx.get(number)?.full_name ?? `#${number}`;
 const teamOf = (idx, number) => idx.get(number)?.team_name ?? "—";
 
-// The race session that fixes a season's standings: a specific round when
-// `afterRound` is given, otherwise the most recent race that has run.
 async function targetRaceSession(queryClient, year, afterRound) {
   const sessions = await f1Fetch.sessionsByYear(queryClient, year);
   const races = sessions
@@ -171,7 +159,6 @@ async function get_event_schedule(args, { queryClient }) {
 async function get_session_extras(args, { queryClient }) {
   const { year, grand_prix, session: sessionName = "Race", kind } = args;
 
-  // Pole always comes from Qualifying regardless of the session the user named.
   if (kind === "pole") {
     const { meeting, session: quali } = await resolveSession(queryClient, {
       year,
@@ -258,8 +245,6 @@ async function get_session_extras(args, { queryClient }) {
   return { ok: false, problem: `Unsupported extra "${kind}".` };
 }
 
-// Backstop validation: the system prompt gathers all four fields first, but
-// guard against a premature call so we never build an empty report (FR-012).
 async function download_telemetry_report(args, { queryClient }) {
   const { year, grand_prix, session, drivers, lap } = args;
   const missing = [];
@@ -283,8 +268,6 @@ async function download_telemetry_report(args, { queryClient }) {
     lap,
   });
   if (!result.ok) return result;
-  // Encode the exact selection into the link so it deep-links to these drivers
-  // even when the Telemetry page is already open on the same season (no remount).
   const { selection, ...rest } = result;
   const params = applySelectionToParams(
     new URLSearchParams({ year: String(year) }),
