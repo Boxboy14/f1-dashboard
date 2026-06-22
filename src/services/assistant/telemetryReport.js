@@ -1,9 +1,3 @@
-// Imperative twin of useTelemetryComparison: useTelemetryComparison is a hook
-// and can't run inside the assistant's send loop, so this resolves the session +
-// drivers + lap, fetches the same data through queryClient.fetchQuery, builds
-// chartData with the SAME pure utils, and reuses the existing
-// buildLapSummary -> downloadLapSummary pipeline. Only the fetch orchestration
-// is new (research.md §6).
 import { deriveDistance, resampleToGrid, mergeDrivers } from "../../utils/telemetry.js";
 import { compoundForLap, tyreAgeForLap } from "../../utils/telemetry/tyres.js";
 import { buildLapSummary } from "../../utils/telemetry/lapSummary.js";
@@ -11,9 +5,8 @@ import { downloadLapSummary } from "../../utils/telemetry/lapSummaryPdf.js";
 import { writeTelemetrySelection } from "../../utils/telemetry/selectionStorage.js";
 import { f1Fetch, matchDriver, resolveSession } from "./f1Resolvers.js";
 
-const TELEMETRY_GRID_POINTS = 400; // matches useOpenF1's telemetry resolution
+const TELEMETRY_GRID_POINTS = 400;
 
-// `lap` is a lap number or "fastest"; returns the chosen lap object or null.
 function pickLap(laps, lap) {
   const valid = laps.filter((l) => l.lap_duration != null && !l.is_pit_out_lap);
   if (!valid.length) return { error: "no-laps" };
@@ -24,9 +17,6 @@ function pickLap(laps, lap) {
   return found ? { lap: found } : { error: "no-lap" };
 }
 
-// Resolves everything, builds the report, and triggers the file download.
-// Returns { ok: true, summary } on success or { ok: false, problem } for any
-// invalid/empty combo so the model can ask the user to adjust (FR-012).
 export async function buildAndDownloadReport({ queryClient, year, grandPrix, session, drivers, lap }) {
   const { meeting, session: sess } = await resolveSession(queryClient, {
     year,
@@ -118,9 +108,6 @@ export async function buildAndDownloadReport({ queryClient, year, grandPrix, ses
     driverNumbers: resolved.map((d) => d.driver_number),
     lapNumber: lap == null || lap === "fastest" ? null : Number(lap),
   };
-  // Persist it (a bare /telemetry visit restores the last selection from here),
-  // and return it so the tool can build a fully-qualified deep link that selects
-  // these exact drivers regardless of what the page was previously showing.
   writeTelemetrySelection(selection);
 
   const names = reportDrivers.map((d) => d.name).join(" vs ");

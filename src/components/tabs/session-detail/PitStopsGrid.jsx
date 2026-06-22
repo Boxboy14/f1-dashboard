@@ -3,8 +3,6 @@ import DataGrid from "../../DataGrid.jsx";
 import TeamCellRenderer from "../../../utils/cellRenderers/TeamCellRenderer.jsx";
 import styles from "./PitStopsGrid.module.scss";
 
-// ── cell renderers (module-level = stable reference, no re-creation on render) ──
-
 const DriverGroupCellRenderer = ({ data, context }) => {
   if (data.rowType === "child") {
     return <span className={styles.childIndent} />;
@@ -31,8 +29,6 @@ const TeamColumnRenderer = (params) => {
   if (params.data?.rowType === "child") return null;
   return <TeamCellRenderer {...params} />;
 };
-
-// ── column definitions ───────────────────────────────────────────────────────
 
 const columnDefs = [
   {
@@ -71,8 +67,6 @@ const columnDefs = [
   },
 ];
 
-// ── data transformation ──────────────────────────────────────────────────────
-
 function buildViewRows(pitStops, expandedDrivers) {
   const grouped = new Map();
   pitStops.forEach((stop) => {
@@ -105,8 +99,6 @@ function buildViewRows(pitStops, expandedDrivers) {
   });
   return rows;
 }
-
-// ── component ────────────────────────────────────────────────────────────────
 
 const PitStopsGrid = ({ pitStops, isLoading, height }) => {
   const [expandedDrivers, setExpandedDrivers] = useState(new Set());

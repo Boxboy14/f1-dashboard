@@ -1,6 +1,3 @@
-// Builds the structured lap-summary report (pure data — no PDF, no React) from
-// the same chartData the telemetry charts render. Kept separate from the PDF
-// renderer so the report could feed a different format later without rework.
 import { CHANNELS } from "../../components/tabs/telemetry/channels.js";
 import { titleCaseCompound } from "./tyres.js";
 
@@ -14,7 +11,6 @@ const avgOf = (a) =>
 const shareOn = (a, pred) =>
   a.length ? (a.filter(pred).length / a.length) * 100 : 0;
 
-// One channel's bullet + paragraph across the (1 or 2) drivers with lap data.
 function summarizeChannel(channel, okDrivers, chartData) {
   const per = okDrivers.map((d) => {
     const v = colValues(chartData, channel.key, d.suffix);

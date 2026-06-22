@@ -26,8 +26,6 @@ import TrackMap from "../tabs/telemetry/TrackMap.jsx";
 import TelemetryCharts from "../tabs/telemetry/TelemetryCharts.jsx";
 import styles from "./TelemetryPage.module.scss";
 
-// Keyed by year: changing the navbar season remounts the view, which resets
-// every selection (dropdowns + charts) to the start — the React-idiomatic reset.
 const TelemetryPage = () => {
   const { year } = useOutletContext();
   return <TelemetryView key={year} year={year} />;
@@ -36,20 +34,11 @@ const TelemetryPage = () => {
 const TelemetryView = ({ year }) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // The URL is the source of truth for the selection (CLAUDE.md routing rule).
-  // Deriving it every render — rather than from once-on-mount state — means a
-  // link that changes the params (e.g. the assistant's "open the telemetry
-  // comparison" link for a freshly built report) updates the view immediately,
-  // even when we're already on this page at the same season and the year remount
-  // key hasn't changed.
   const { meetingKey, sessionKey, driverNumbers, lapNumber } = useMemo(
     () => parseSelectionParams(searchParams),
     [searchParams],
   );
 
-  // On first mount with an empty URL, seed it from the last selection saved for
-  // this year so a refresh or tab-return isn't blank. A populated URL always
-  // wins, so a deep link is never overridden.
   const didRestore = useRef(false);
   useEffect(() => {
     if (didRestore.current) return;
@@ -63,7 +52,6 @@ const TelemetryView = ({ year }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Persist for cross-session restore; the URL already covers in-session nav.
   useEffect(() => {
     writeTelemetrySelection({ year, meetingKey, sessionKey, driverNumbers, lapNumber });
   }, [year, meetingKey, sessionKey, driverNumbers, lapNumber]);
@@ -102,8 +90,6 @@ const TelemetryView = ({ year }) => {
     [drivers],
   );
 
-  // All selection edits flow through the URL. Reading the previous params inside
-  // the updater keeps the unchanged fields intact without stale-closure risk.
   const patchSelection = useCallback(
     (patch) =>
       setSearchParams(
@@ -114,7 +100,6 @@ const TelemetryView = ({ year }) => {
     [setSearchParams],
   );
 
-  // Changing event/session resets the dependent selections downstream.
   const onEventChange = useCallback(
     (value) =>
       patchSelection({ meetingKey: value, sessionKey: null, driverNumbers: [], lapNumber: null }),
@@ -141,8 +126,6 @@ const TelemetryView = ({ year }) => {
     isLoading,
   } = useTelemetryComparison(sessionKey, driverNumbers, lapNumber);
 
-  // Enrich each driver with tyre compound/age for the displayed lap and the
-  // lap-time gap to the faster driver (only meaningful with two timed laps).
   const enrichedDrivers = useMemo(() => {
     const okTimes = telemetryDrivers
       .filter((d) => d.status === "ok" && d.lapTime != null)

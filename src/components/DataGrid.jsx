@@ -8,8 +8,6 @@ const defaultColDefs = {
   resizable: true,
 };
 
-// ag-grid applies these params as CSS custom properties, so var(--salt-…) refs
-// resolve and re-theme automatically when SaltProvider flips mode.
 const gridTheme = themeQuartz.withParams({
   backgroundColor: "var(--salt-container-primary-background)",
   foregroundColor: "var(--salt-content-primary-foreground)",

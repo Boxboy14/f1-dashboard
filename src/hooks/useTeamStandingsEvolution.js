@@ -7,15 +7,6 @@ import { createTeamSlug } from "../store/teams/utils.js";
 
 const RACE_STALE = 10 * 60 * 1000;
 
-// Assembles a season's championship evolution for the Teams-page charts:
-// the ordered race rounds (sprints excluded), each team's colour (resolved
-// via /drivers since /championship_teams has no colour field), and per-round
-// points/position series. All completed rounds' standings are fetched in a
-// single request — OpenF1 treats repeated `session_key` params as an OR
-// filter, so `?session_key=A&session_key=B…` returns every round's rows in
-// one call instead of one request per round (which, fanned out through the
-// 3 req/sec rate limiter, was the reason these charts took several seconds
-// to load).
 export function useTeamStandingsEvolution(year) {
   const { data: sessions = [] } = useSessions({ year, session_type: "Race" });
   const { data: meetings = [] } = useMeetings({ year });
@@ -29,7 +20,7 @@ export function useTeamStandingsEvolution(year) {
     );
     const now = Date.now();
     return sessions
-      .filter((s) => s.session_name === "Race") // races only — exclude sprints
+      .filter((s) => s.session_name === "Race")
       .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))
       .map((s, i) => ({
         round: i + 1,
@@ -68,9 +59,6 @@ export function useTeamStandingsEvolution(year) {
     return map;
   }, [standingsRows]);
 
-  // Team colour (championship_teams has no colour field). Union the first and
-  // last completed rounds' driver rosters so a team that fielded a mid-season
-  // driver swap still resolves a colour — last round wins for shared team names.
   const firstCompletedKey = completedRounds[0]?.sessionKey ?? null;
   const lastCompletedKey = completedRounds.at(-1)?.sessionKey ?? null;
   const { data: firstDrivers = [] } = useDrivers(

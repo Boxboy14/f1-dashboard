@@ -298,8 +298,6 @@ function useSessionDetail(sessionKey) {
     { enabled: Boolean(sessionKey) }
   );
 
-  // The Grand Prix name lives on /meetings, not /sessions — fetched once the
-  // session resolves its meeting_key (dedupes with the meeting-page query).
   const meetingKey = sessions[0]?.meeting_key;
   const { data: meetings = [] } = useMeetings(
     { meeting_key: meetingKey },
@@ -573,15 +571,12 @@ function useSeasonKpis(year) {
 
 const TELEMETRY_GRID_POINTS = 400;
 
-// One driver's fastest-lap telemetry: find the fastest valid lap, then fetch
-// only that lap's car_data window (dependent fetch).
 function useDriverLapTelemetry(sessionKey, driverNumber, lapNumber) {
   const { data: laps = [], isLoading: lapsLoading } = useLaps(
     { session_key: sessionKey, driver_number: driverNumber },
     { enabled: Boolean(sessionKey && driverNumber) }
   );
 
-  // lapNumber === null → fastest valid lap; otherwise the requested lap.
   const lap = useMemo(() => {
     const valid = laps.filter(
       (l) => l.lap_duration != null && !l.is_pit_out_lap
@@ -619,7 +614,6 @@ function useTelemetryComparison(sessionKey, driverNumbers = [], lapNumber = null
   const slotA = driverNumbers[0] ?? null;
   const slotB = driverNumbers[1] ?? null;
 
-  // Two fixed slots → constant hook count whether 1 or 2 drivers are selected.
   const a = useDriverLapTelemetry(sessionKey, slotA, lapNumber);
   const b = useDriverLapTelemetry(sessionKey, slotB, lapNumber);
 
@@ -628,8 +622,6 @@ function useTelemetryComparison(sessionKey, driverNumbers = [], lapNumber = null
     { enabled: Boolean(sessionKey) }
   );
 
-  // Union of both drivers' selectable (timed, non-out) lap numbers, for the
-  // shared Lap dropdown.
   const lapNumbers = useMemo(() => {
     const set = new Set();
     for (const list of [a.laps, b.laps]) {
@@ -640,8 +632,6 @@ function useTelemetryComparison(sessionKey, driverNumbers = [], lapNumber = null
     return [...set].sort((x, y) => x - y);
   }, [a.laps, b.laps]);
 
-  // The track outline is drawn from one driver's lap position trace — slot A if
-  // it has data, otherwise slot B.
   const outline = useMemo(() => {
     if (a.lap && a.samples.length) {
       return { dn: slotA, lap: a.lap, slot: 0, suffix: "a" };

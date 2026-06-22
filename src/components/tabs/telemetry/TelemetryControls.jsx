@@ -10,9 +10,6 @@ import styles from "./TelemetryControls.module.scss";
 const labelFor = (options) => (value) =>
   options.find((o) => String(o.value) === String(value))?.label ?? String(value);
 
-// Salt's Dropdown shows whatever the `value` prop holds in its button (not the
-// selected key, not `valueToString`). So we build the button text ourselves and
-// fall back to `undefined` when nothing is selected, which surfaces the placeholder.
 const TelemetryControls = ({
   events,
   sessions,

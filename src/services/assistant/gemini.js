@@ -1,7 +1,3 @@
-// The only module that imports @google/genai — every other assistant module
-// stays SDK-free so the dependency boundary mirrors emailjs.js (Constitution
-// Article IV). The key ships client-side as VITE_GEMINI_API_KEY; on the free
-// tier the worst case of a leak is rate-limit abuse, not cost.
 import { GoogleGenAI } from "@google/genai";
 
 export const GEMINI_MODEL = "gemini-3.1-flash-lite";

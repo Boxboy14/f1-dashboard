@@ -2,11 +2,6 @@ import { schedule } from "./rateLimiter.js";
 
 const BASE_URL = "https://api.openf1.org/v1";
 
-// OpenF1 treats repeated instances of the same param as an OR/IN filter
-// (verified live: `?session_key=A&session_key=B` returns rows for both), so
-// an array value fans out to one param per element instead of one request
-// per value — this is what lets the standings-evolution charts fetch every
-// round's data in a single call.
 function buildUrl(endpoint, params = {}) {
   const url = new URL(`${BASE_URL}${endpoint}`);
   Object.entries(params).forEach(([key, value]) => {
@@ -31,11 +26,6 @@ function fetchOpenF1(endpoint, params = {}) {
   return fetchOpenF1Url(buildUrl(endpoint, params));
 }
 
-// Ranged single-lap fetch for time-series endpoints (car_data, location).
-// buildUrl can't express the `date>=` / `date<` operators, so we assemble the
-// URL by hand: operators percent-encoded, and the timestamp value
-// encodeURIComponent-ed so its `+00:00` offset survives (a bare `+` would be
-// read as a space).
 function rangedLapUrl(endpoint, { session_key, driver_number, date_gte, date_lt }) {
   return (
     `${BASE_URL}/${endpoint}?session_key=${session_key}&driver_number=${driver_number}` +

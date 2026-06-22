@@ -15,12 +15,10 @@ import styles from "./TeamStandingsCharts.module.scss";
 const TOOLTIP_BG = "var(--salt-container-primary-background)";
 const TOOLTIP_BORDER = "var(--salt-separable-secondary-borderColor)";
 
-// Wider right margin than the Drivers tab's bump chart — team names are
-// labelled in full at the right edge (vs. a 3-letter driver code).
 const MARGIN = { top: 8, right: 120, bottom: 24, left: 8 };
 const X_AXIS_H = 28;
 const Y_AXIS_W = 28;
-const X_PAD = 12; // keeps the first/last flag off the axis lines
+const X_PAD = 12;
 
 const ordinal = (n) => {
   const s = ["th", "st", "nd", "rd"];
@@ -28,9 +26,6 @@ const ordinal = (n) => {
   return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
 };
 
-// Single-team panel for the hovered line: name + position post that round.
-// `label`/`payload` come from Recharts (the active round + every line's value);
-// `hovered` (which team) is supplied by the chart's own cursor tracking.
 const RankTooltip = ({ active, payload, label, rounds, teams, hovered }) => {
   if (!active || hovered == null) return null;
   const round = rounds.find((r) => r.round === label);
@@ -69,10 +64,6 @@ const RankingEvolutionChart = ({ rounds, teams, data, teamCount }) => {
   const height = Math.max(380, teamCount * 22);
   const posTicks = Array.from({ length: teamCount }, (_, i) => i + 1);
 
-  // Recharts 3's mouse-move state no longer carries the cursor coordinate, so we
-  // detect the hovered line entirely from the DOM event + data + plot geometry:
-  // map cursor X → active round and cursor Y → fractional position, then pick the
-  // team whose position that round is nearest. Robust where lines cross.
   const detect = (clientX, clientY) => {
     const el = wrapRef.current;
     if (!el || !data.length) return;

@@ -30,8 +30,8 @@ const DashboardLayout = () => {
   useEffect(() => {
     try {
       localStorage.setItem(SIDEBAR_KEY, String(collapsed));
+      // eslint-disable-next-line no-empty
     } catch {
-      /* localStorage unavailable — collapse just won't persist */
     }
   }, [collapsed]);
   const [searchParams, setSearchParams] = useSearchParams();

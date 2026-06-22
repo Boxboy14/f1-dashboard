@@ -6,14 +6,6 @@ import { driverColor } from "../components/tabs/drivers/standings/standingsColor
 
 const RACE_STALE = 10 * 60 * 1000;
 
-// Assembles a season's championship evolution for the Drivers-tab charts:
-// the ordered race rounds (sprints excluded), each driver's team-coloured
-// identity, and per-round points/position series. All completed rounds'
-// standings are fetched in a single request — OpenF1 treats repeated
-// `session_key` params as an OR filter, so `?session_key=A&session_key=B…`
-// returns every round's rows in one call instead of one request per round
-// (which, fanned out through the 3 req/sec rate limiter, was the reason
-// these charts took several seconds to load).
 export function useDriverStandingsEvolution(year) {
   const { data: sessions = [] } = useSessions({ year, session_type: "Race" });
   const { data: meetings = [] } = useMeetings({ year });
@@ -27,7 +19,7 @@ export function useDriverStandingsEvolution(year) {
     );
     const now = Date.now();
     return sessions
-      .filter((s) => s.session_name === "Race") // races only — exclude sprints
+      .filter((s) => s.session_name === "Race")
       .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))
       .map((s, i) => ({
         round: i + 1,
@@ -66,11 +58,6 @@ export function useDriverStandingsEvolution(year) {
     return map;
   }, [standingsRows]);
 
-  // Driver identity (name, 3-letter code, team colour). Union the first and last
-  // completed rounds' rosters so a driver who left mid-season (e.g. Sargeant,
-  // de Vries, Doohan) keeps their real name/code/colour instead of falling back
-  // to a number — the last round alone omits them. Last round wins for shared
-  // numbers so the current roster's team colour is used.
   const firstCompletedKey = completedRounds[0]?.sessionKey ?? null;
   const lastCompletedKey = completedRounds.at(-1)?.sessionKey ?? null;
   const { data: firstDrivers = [] } = useDrivers(

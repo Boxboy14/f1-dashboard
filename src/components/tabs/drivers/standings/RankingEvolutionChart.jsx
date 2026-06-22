@@ -18,7 +18,7 @@ const TOOLTIP_BORDER = "var(--salt-separable-secondary-borderColor)";
 const MARGIN = { top: 8, right: 44, bottom: 24, left: 8 };
 const X_AXIS_H = 28;
 const Y_AXIS_W = 28;
-const X_PAD = 12; // keeps the first/last flag off the axis lines
+const X_PAD = 12;
 
 const ordinal = (n) => {
   const s = ["th", "st", "nd", "rd"];
@@ -26,9 +26,6 @@ const ordinal = (n) => {
   return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
 };
 
-// Single-driver panel for the hovered line: name + position post that round.
-// `label`/`payload` come from Recharts (the active round + every line's value);
-// `hovered` (which driver) is supplied by the chart's own cursor tracking.
 const RankTooltip = ({ active, payload, label, rounds, drivers, hovered }) => {
   if (!active || hovered == null) return null;
   const round = rounds.find((r) => r.round === label);
@@ -67,10 +64,6 @@ const RankingEvolutionChart = ({ rounds, drivers, data, driverCount }) => {
   const height = Math.max(380, driverCount * 22);
   const posTicks = Array.from({ length: driverCount }, (_, i) => i + 1);
 
-  // Recharts 3's mouse-move state no longer carries the cursor coordinate, so we
-  // detect the hovered line entirely from the DOM event + data + plot geometry:
-  // map cursor X → active round and cursor Y → fractional position, then pick the
-  // driver whose position that round is nearest. Robust where lines cross.
   const detect = (clientX, clientY) => {
     const el = wrapRef.current;
     if (!el || !data.length) return;

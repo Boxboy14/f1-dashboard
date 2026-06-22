@@ -6,7 +6,6 @@ import useInView from "../../../hooks/useInView.js";
 import { formatWeekend } from "./utils/formatters.js";
 import styles from "./GrandPrixCard.module.scss";
 
-// Gold / silver / bronze, mapped to the nearest Salt palette tokens.
 const PODIUM_COLOR = {
   1: "var(--salt-color-citrine-500)",
   2: "var(--salt-color-gray-300)",
@@ -21,9 +20,6 @@ const GrandPrixCard = ({ gp, driversByNumber, onOpenMeeting }) => {
     {
       enabled:
         inView && gp.status === "Completed" && Boolean(gp.raceSessionKey),
-      // Scroll-triggered, one card at a time, with its own "Loading
-      // results…" placeholder — excluded from the global loading overlay so
-      // scrolling the Overview page doesn't repeatedly freeze the screen.
       meta: { background: true },
     },
   );

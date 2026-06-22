@@ -1,6 +1,3 @@
-// Pirelli-style compound badge: a colored ring with the compound's letter,
-// matching the broadcast tyre logos. Colors are Salt palette tokens (applied
-// via inline `style` since SVG fill attributes don't resolve var()).
 const COMPOUNDS = {
   SOFT: { color: "var(--salt-color-red-500)", letter: "S" },
   MEDIUM: { color: "var(--salt-color-citrine-500)", letter: "M" },

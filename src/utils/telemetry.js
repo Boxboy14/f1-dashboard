@@ -1,9 +1,3 @@
-// Pure telemetry math — no React, no fetching. Turns raw /car_data samples into
-// distance-aligned rows two drivers' laps can share on one x-axis.
-
-// Cumulative distance (m) by integrating speed over time. /car_data has no
-// distance field, so we derive it: speed (km/h) -> m/s, times the gap to the
-// previous sample.
 const deriveDistance = (samples) => {
   let distance = 0;
   let prev = null;
@@ -38,8 +32,6 @@ const interpolateAt = (samples, distance) => {
   return row;
 };
 
-// Resample a driver's lap onto `points` evenly-spaced distances. Discrete
-// channels (gear, drs) use nearest-sample so we never invent a "gear 4.3".
 const resampleToGrid = (samplesWithDistance, points) => {
   if (samplesWithDistance.length === 0) return [];
   const total = samplesWithDistance.at(-1).distance;
@@ -51,10 +43,6 @@ const resampleToGrid = (samplesWithDistance, points) => {
 
 const decodeDrs = (v) => (v === 10 || v === 12 || v === 14 ? 1 : 0);
 
-// Merge resampled grids into chart rows: { distance, speed_a, speed_b, ... }.
-// Either grid may be null (single driver, or one driver had no valid lap) —
-// only the present driver's columns are written. Both grids share the same
-// point count, so index i is the same fraction of each lap (aligned corners).
 const round2 = (n) => Math.round(n * 100) / 100;
 
 const mergeDrivers = (gridA, gridB) => {
@@ -91,11 +79,6 @@ const formatLapTime = (seconds) => {
   return `${mins}:${secs}`;
 };
 
-// ── Track map geometry ───────────────────────────────────────────────────────
-
-// Cumulative distance (m) along the racing line by straight-line arc length
-// between consecutive position samples. /location already gives positions, so
-// unlike car_data we measure distance from the path itself, not from speed.
 const deriveTrackDistance = (location) => {
   let distance = 0;
   let prev = null;
@@ -119,8 +102,6 @@ const interpolateXY = (points, distance) => {
   return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
 };
 
-// Resample the outline onto `points` evenly-spaced distances — the SAME
-// resolution as resampleToGrid, so index i lines up with chartData[i].
 const resampleTrack = (pointsWithDistance, points) => {
   if (pointsWithDistance.length < 2) return [];
   const total = pointsWithDistance.at(-1).distance;
@@ -131,9 +112,6 @@ const resampleTrack = (pointsWithDistance, points) => {
   );
 };
 
-// Per grid-point winner slot (0/1) smoothed over `minisectorCount` equal-length
-// minisectors: whoever carried more total speed through a minisector (= less
-// time over equal distance) wins all of it. null if either driver is missing.
 const buildDominance = (chartData, minisectorCount = 24) => {
   if (!chartData.length || chartData[0].speed_a == null || chartData[0].speed_b == null) {
     return null;
@@ -155,7 +133,6 @@ const buildDominance = (chartData, minisectorCount = 24) => {
   return faster;
 };
 
-// Per grid-point speed normalized 0..1 across the lap for one driver (`a`/`b`).
 const buildSpeedShade = (chartData, suffix) => {
   const key = `speed_${suffix}`;
   const values = chartData.map((r) => r[key]);

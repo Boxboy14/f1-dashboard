@@ -25,7 +25,6 @@ const Navbar = ({ onDriverSelect, onMenuClick, year, onYearChange }) => {
         <img src={logo} alt="F1 Dashboard" className={styles.brand} />
       </div>
       <div className={styles.right}>
-        {/* <DriverSearchBar onDriverSelect={onDriverSelect} year={year} /> */}
         <YearSelector value={year} onChange={onYearChange} />
         <ThemeToggle />
       </div>

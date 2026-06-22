@@ -6,15 +6,13 @@ import {
   UserGroupIcon,
   CalendarIcon,
   ChartLineIcon,
+  HelpIcon,
   FeedbackIcon,
   DoubleChevronLeftIcon,
   DoubleChevronRightIcon,
 } from "@salt-ds/icons";
 import styles from "./Sidebar.module.scss";
 
-// `match` lists the route prefixes that belong to a tab. The Calendar tab owns
-// the meeting and session detail pages too (reached by drilling into a GP),
-// which live outside `/seasons`, so its highlight must persist on those routes.
 const NAV_ITEMS = [
   { label: "Overview", icon: DashboardIcon, path: "/overview" },
   { label: "Drivers", icon: UserIcon, path: "/drivers" },
@@ -28,7 +26,7 @@ const NAV_ITEMS = [
   { label: "Telemetry", icon: ChartLineIcon, path: "/telemetry" },
 ];
 
-// Auxiliary action pinned to the bottom of the sidebar, separate from the data tabs.
+const HOW_TO_USE_ITEM = { label: "How to Use", icon: HelpIcon, path: "/how-to-use" };
 const FEEDBACK_ITEM = { label: "Feedback", icon: FeedbackIcon, path: "/feedback" };
 
 const isPathActive = (pathname, prefixes) =>
@@ -58,7 +56,6 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
         <span className={styles.navLabel}>{label}</span>
       </NavLink>
     );
-    // Collapsed rail hides labels, so surface the tab name on hover.
     return collapsed ? (
       <Tooltip key={path} content={label} placement="right">
         {link}
@@ -81,7 +78,10 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
           .join(" ")}
       >
         <nav className={styles.nav}>{NAV_ITEMS.map(renderItem)}</nav>
-        <nav className={styles.bottomNav}>{renderItem(FEEDBACK_ITEM)}</nav>
+        <nav className={styles.bottomNav}>
+          {renderItem(HOW_TO_USE_ITEM)}
+          {renderItem(FEEDBACK_ITEM)}
+        </nav>
         <div className={styles.footer}>
           <Button
             appearance="transparent"

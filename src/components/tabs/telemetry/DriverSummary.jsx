@@ -14,8 +14,6 @@ const fmtSector = (s) => (s == null ? "–" : s.toFixed(3));
 const fmtTyreAge = (n) => (n == null ? null : `${n} lap${n === 1 ? "" : "s"}`);
 const hasSectors = (s) => s && (s.s1 != null || s.s2 != null || s.s3 != null);
 
-// OpenF1 headshots default to a small "1col" transform; request a larger one
-// when the pattern is present, falling back to the original if it 404s.
 const hdPhoto = (url) =>
   url && url.includes("1col") ? url.replace("1col", "4col") : url;
 

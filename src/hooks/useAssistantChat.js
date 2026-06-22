@@ -4,28 +4,13 @@ import { streamTurn } from "../services/assistant/gemini.js";
 import { systemInstruction } from "../services/assistant/systemInstruction.js";
 import { functionDeclarations, handlers } from "../services/assistant/tools.js";
 
-// @google/genai mental model: Gemini doesn't know F1 results — it decides WHICH
-// question to ask the data layer. A turn is a loop, not a single call:
-//   stream → if the model emits functionCall parts, run the matching handler →
-//   append the result as a functionResponse → stream again → repeat until the
-//   model returns plain text. We are the executor; OpenF1 is the source of
-//   truth. General-knowledge turns need no tool and end on the first stream.
-//
-// This hook deliberately registers no useQuery/useMutation: the Gemini call
-// bypasses TanStack entirely, and every OpenF1 fetch the handlers make is
-// tagged meta:{ background: true }, so the GlobalLoadingOverlay never counts the
-// assistant's traffic.
-
-const MAX_TOOL_ROUNDS = 5; // guard against a tool loop that never settles
+const MAX_TOOL_ROUNDS = 5;
 
 const newId = () =>
   typeof crypto !== "undefined" && crypto.randomUUID
     ? crypto.randomUUID()
     : String(Math.random());
 
-// The API is stateless, so the full turn history is sent each request (FR-014).
-// Only completed text turns go to the model — the streaming placeholder and any
-// error notices are skipped so they never pollute context.
 function toContents(messages) {
   return messages
     .filter((m) => m.status === "done" && m.text)
@@ -63,11 +48,9 @@ export function useAssistantChat() {
         links: [],
       };
 
-      // Snapshot history from prior turns before the placeholder is appended.
       const history = [...toContents(messages), { role: "user", parts: [{ text }] }];
       setMessages((prev) => [...prev, userMessage, assistantMessage]);
 
-      // Page links accumulate across every tool round of this turn (FR-009).
       const pageLinks = [];
       const collectLink = (result) => {
         if (!result?.page) return;
@@ -98,10 +81,6 @@ export function useAssistantChat() {
             break;
           }
 
-          // The model wants data: record its tool turn (the function-call parts
-          // verbatim, so Gemini 3's thoughtSignature is preserved — see
-          // gemini.js), run each handler, then feed the results back as a single
-          // function-response turn.
           history.push({ role: "model", parts: callParts });
           const responseParts = [];
           for (const { functionCall: call } of callParts) {
@@ -121,7 +100,6 @@ export function useAssistantChat() {
           }
           history.push({ role: "user", parts: responseParts });
 
-          // Drop any preamble text so the next round streams onto a clean bubble.
           updateMessage(assistantId, { text: "", links: pageLinks });
         }
 
