@@ -7,6 +7,7 @@ import MeetingPage from "./components/dashboard/MeetingPage.jsx";
 import SessionDetailPage from "./components/dashboard/SessionDetailPage.jsx";
 import OverviewPage from "./components/dashboard/OverviewPage.jsx";
 import TelemetryPage from "./components/dashboard/TelemetryPage.jsx";
+import HowToUsePage from "./components/dashboard/HowToUsePage.jsx";
 import FeedbackPage from "./components/dashboard/FeedbackPage.jsx";
 import DashboardLayout from "./components/dashboard/layouts/DashboardLayout.jsx";
 import GlobalLoadingOverlay from "./components/common/GlobalLoadingOverlay.jsx";
@@ -27,6 +28,7 @@ function App() {
           <Route path="meetings/:meetingKey" element={<MeetingPage />} />
           <Route path="sessions/:sessionKey" element={<SessionDetailPage />} />
           <Route path="telemetry" element={<TelemetryPage />} />
+          <Route path="how-to-use" element={<HowToUsePage />} />
           <Route path="feedback" element={<FeedbackPage />} />
         </Route>
       </Routes>

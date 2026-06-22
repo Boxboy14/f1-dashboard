@@ -1,0 +1,30 @@
+.list {
+  margin: 8px 0 0;
+  padding-left: 20px;
+
+  li {
+    margin-bottom: 4px;
+  }
+}
+
+.subheading {
+  display: block;
+  margin: 16px 0 4px;
+}
+
+.tip {
+  margin-top: 12px;
+}
+
+.liveSessionNotice {
+  margin-top: 24px;
+  border: 2px solid var(--salt-status-warning-borderColor);
+  font-weight: var(--font-weight-bold);
+}
+
+.liveSessionNoticeHeading {
+  display: block;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
