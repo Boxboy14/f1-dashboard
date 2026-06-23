@@ -54,7 +54,7 @@ async function get_race_result(args, { queryClient }) {
     grand_prix: meeting.meeting_name,
     session: session.session_name,
     classification,
-    page: `/sessions/${session.session_key}`,
+    page: `/sessions/${session.session_key}?year=${year}`,
     pageLabel: `${year} ${meeting.meeting_name} — ${session.session_name}`,
   };
 }
@@ -76,7 +76,7 @@ async function get_championship_standings(args, { queryClient }) {
         name: t.team_name,
         points: t.points_current,
       }));
-    return { year, type, standings, page: "/teams", pageLabel: `${year} Constructor standings` };
+    return { year, type, standings, page: `/teams?year=${year}`, pageLabel: `${year} Constructor standings` };
   }
 
   const [champ, drivers] = await Promise.all([
@@ -94,7 +94,7 @@ async function get_championship_standings(args, { queryClient }) {
       team: teamOf(idx, s.driver_number),
       points: s.points_current,
     }));
-  return { year, type: "driver", standings, page: "/drivers", pageLabel: `${year} Driver standings` };
+  return { year, type: "driver", standings, page: `/drivers?year=${year}`, pageLabel: `${year} Driver standings` };
 }
 
 async function get_driver_season(args, { queryClient }) {
@@ -118,7 +118,7 @@ async function get_driver_season(args, { queryClient }) {
     team: driver.team_name ?? "—",
     points: standing?.points_current ?? null,
     position: standing?.position_current ?? null,
-    page: `/drivers/${createDriverSlug(driver)}`,
+    page: `/drivers/${createDriverSlug(driver)}?year=${year}`,
     pageLabel: `${driver.full_name} — ${year}`,
   };
 }
@@ -183,7 +183,7 @@ async function get_session_extras(args, { queryClient }) {
       grand_prix: meeting.meeting_name,
       kind,
       pole: { driver: nameOf(idx, p1.driver_number), team: teamOf(idx, p1.driver_number) },
-      page: `/sessions/${quali.session_key}`,
+      page: `/sessions/${quali.session_key}?year=${year}`,
       pageLabel: `${year} ${meeting.meeting_name} — Qualifying`,
     };
   }
@@ -199,7 +199,7 @@ async function get_session_extras(args, { queryClient }) {
     return { ok: false, problem: `Couldn't find a "${sessionName}" session for the ${year} ${meeting.meeting_name}.` };
 
   const pageLabel = `${year} ${meeting.meeting_name} — ${session.session_name}`;
-  const page = `/sessions/${session.session_key}`;
+  const page = `/sessions/${session.session_key}?year=${year}`;
 
   if (kind === "pit_stops") {
     const [pits, drivers] = await Promise.all([
