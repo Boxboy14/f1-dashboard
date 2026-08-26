@@ -20,6 +20,9 @@ dist-ssr
 # Claude Code — local session permissions (machine-specific, changes every session)
 .claude/settings.local.json
 
+# Claude Code — spec-sync hook state (ephemeral, per-session)
+.claude/hooks/.state/
+
 # CLAUDE.md — project-level AI instructions (personal config, not shared)
 claude.md
 CLAUDE.md

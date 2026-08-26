@@ -1,0 +1,99 @@
+{
+  "$comment": "Source-of-truth mapping from source-code locations to the spec folder(s) under specs/ that govern them. Consulted by .claude/hooks/spec-sync-check.cjs (Claude Code) and .github/instructions/spec-sync.instructions.md (Copilot). A file matches a bucket if its path starts with one of that bucket's 'paths' entries (directory prefixes end in '/') or equals one exactly (single files). When multiple buckets match, the longest/most specific match wins. Files matching no bucket are intentionally unmapped shared/cross-cutting code (e.g. src/App.jsx, src/hooks/useOpenF1.js, src/services/api/openf1.js, src/components/dashboard/Sidebar/, src/components/dashboard/Navbar/Navbar.jsx, src/components/dashboard/layouts/) — edits there should prompt a judgment call rather than a false-confident match. When a new spec folder is created (spec-sync 'create new spec' option), add its bucket here as the final step — see specs/SPEC_SYNC_POLICY.md.",
+  "buckets": {
+    "drivers": {
+      "paths": [
+        "src/components/tabs/drivers/",
+        "src/components/dashboard/HomePage.jsx",
+        "src/components/dashboard/HomePage.module.scss",
+        "src/components/dashboard/Navbar/YearSelector.jsx",
+        "src/components/dashboard/Navbar/YearSelector.module.scss"
+      ],
+      "specs": ["001-drivers-tab", "011-drivers-standings-charts"]
+    },
+    "teams": {
+      "paths": [
+        "src/components/tabs/teams/",
+        "src/components/dashboard/TeamsPage.jsx",
+        "src/components/dashboard/TeamsPage.module.scss"
+      ],
+      "specs": ["002-teams-page"]
+    },
+    "calendar": {
+      "paths": [
+        "src/components/tabs/calendar/",
+        "src/components/dashboard/SeasonsPage.jsx"
+      ],
+      "specs": ["003-race-calendar"]
+    },
+    "sessions": {
+      "paths": [
+        "src/components/tabs/sessions/",
+        "src/components/dashboard/MeetingPage.jsx",
+        "src/components/dashboard/MeetingPage.module.scss"
+      ],
+      "specs": ["004-meeting-sessions"]
+    },
+    "session-detail": {
+      "paths": [
+        "src/components/tabs/session-detail/",
+        "src/components/dashboard/SessionDetailPage.jsx",
+        "src/components/dashboard/SessionDetailPage.module.scss"
+      ],
+      "specs": ["005-session-detail"]
+    },
+    "overview": {
+      "paths": [
+        "src/components/tabs/overview/",
+        "src/components/dashboard/OverviewPage.jsx",
+        "src/components/dashboard/OverviewPage.module.scss"
+      ],
+      "specs": ["006-overview-page"]
+    },
+    "telemetry": {
+      "paths": [
+        "src/components/tabs/telemetry/",
+        "src/components/dashboard/TelemetryPage.jsx",
+        "src/components/dashboard/TelemetryPage.module.scss",
+        "src/utils/telemetry.js",
+        "src/utils/telemetry/"
+      ],
+      "specs": ["007-telemetry-comparison", "008-track-dominance-map", "010-telemetry-ui-enhancements"]
+    },
+    "design-system": {
+      "paths": [
+        "src/theme/",
+        "src/index.css",
+        "src/salt-overrides.css",
+        "src/main.jsx"
+      ],
+      "specs": ["009-design-system"]
+    },
+    "feedback": {
+      "paths": [
+        "src/components/tabs/feedback/",
+        "src/components/dashboard/FeedbackPage.jsx",
+        "src/components/dashboard/FeedbackPage.module.scss",
+        "src/services/feedback/",
+        "src/hooks/useFeedbackSubmit.js"
+      ],
+      "specs": ["012-feedback-form"]
+    },
+    "ai-assistant": {
+      "paths": [
+        "src/components/assistant/",
+        "src/hooks/useAssistantChat.js",
+        "src/services/assistant/"
+      ],
+      "specs": ["013-ai-assistant"]
+    },
+    "how-to-use": {
+      "paths": [
+        "src/components/tabs/how-to-use/",
+        "src/components/dashboard/HowToUsePage.jsx",
+        "src/components/dashboard/HowToUsePage.module.scss"
+      ],
+      "specs": ["014-how-to-use-guide"]
+    }
+  }
+}
