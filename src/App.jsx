@@ -1,17 +1,19 @@
 import "./App.css";
+import { lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import HomePage from "./components/dashboard/HomePage.jsx";
-import TeamsPage from "./components/dashboard/TeamsPage.jsx";
-import SeasonsPage from "./components/dashboard/SeasonsPage.jsx";
-import MeetingPage from "./components/dashboard/MeetingPage.jsx";
-import SessionDetailPage from "./components/dashboard/SessionDetailPage.jsx";
-import OverviewPage from "./components/dashboard/OverviewPage.jsx";
-import TelemetryPage from "./components/dashboard/TelemetryPage.jsx";
-import HowToUsePage from "./components/dashboard/HowToUsePage.jsx";
-import FeedbackPage from "./components/dashboard/FeedbackPage.jsx";
 import DashboardLayout from "./components/dashboard/layouts/DashboardLayout.jsx";
 import GlobalLoadingOverlay from "./components/common/GlobalLoadingOverlay.jsx";
 import AssistantLauncher from "./components/assistant/AssistantLauncher.jsx";
+
+const OverviewPage = lazy(() => import("./components/dashboard/OverviewPage.jsx"));
+const TeamsPage = lazy(() => import("./components/dashboard/TeamsPage.jsx"));
+const SeasonsPage = lazy(() => import("./components/dashboard/SeasonsPage.jsx"));
+const MeetingPage = lazy(() => import("./components/dashboard/MeetingPage.jsx"));
+const SessionDetailPage = lazy(() => import("./components/dashboard/SessionDetailPage.jsx"));
+const TelemetryPage = lazy(() => import("./components/dashboard/TelemetryPage.jsx"));
+const HowToUsePage = lazy(() => import("./components/dashboard/HowToUsePage.jsx"));
+const FeedbackPage = lazy(() => import("./components/dashboard/FeedbackPage.jsx"));
 
 function App() {
   return (

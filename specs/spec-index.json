@@ -1,5 +1,5 @@
 {
-  "$comment": "Source-of-truth mapping from source-code locations to the spec folder(s) under specs/ that govern them. Consulted by .claude/hooks/spec-sync-check.cjs (Claude Code) and .github/instructions/spec-sync.instructions.md (Copilot). A file matches a bucket if its path starts with one of that bucket's 'paths' entries (directory prefixes end in '/') or equals one exactly (single files). When multiple buckets match, the longest/most specific match wins. Files matching no bucket are intentionally unmapped shared/cross-cutting code (e.g. src/App.jsx, src/hooks/useOpenF1.js, src/services/api/openf1.js, src/components/dashboard/Sidebar/, src/components/dashboard/Navbar/Navbar.jsx, src/components/dashboard/layouts/) — edits there should prompt a judgment call rather than a false-confident match. When a new spec folder is created (spec-sync 'create new spec' option), add its bucket here as the final step — see specs/SPEC_SYNC_POLICY.md.",
+  "$comment": "Source-of-truth mapping from source-code locations to the spec folder(s) under specs/ that govern them. Consulted by .claude/hooks/spec-sync-check.cjs (Claude Code) and .github/instructions/spec-sync.instructions.md (Copilot). A file matches a bucket if its path starts with one of that bucket's 'paths' entries (directory prefixes end in '/') or equals one exactly (single files). When multiple buckets match, the longest/most specific match wins. Files matching no bucket are intentionally unmapped shared/cross-cutting code (e.g. src/hooks/useOpenF1.js, src/services/api/openf1.js, src/components/dashboard/Sidebar/, src/components/dashboard/Navbar/Navbar.jsx) — edits there should prompt a judgment call rather than a false-confident match. When a new spec folder is created (spec-sync 'create new spec' option), add its bucket here as the final step — see specs/SPEC_SYNC_POLICY.md.",
   "buckets": {
     "drivers": {
       "paths": [
@@ -94,6 +94,13 @@
         "src/components/dashboard/HowToUsePage.module.scss"
       ],
       "specs": ["014-how-to-use-guide"]
+    },
+    "lazy-route-loading": {
+      "paths": [
+        "src/App.jsx",
+        "src/components/dashboard/layouts/"
+      ],
+      "specs": ["015-lazy-route-loading"]
     }
   }
 }

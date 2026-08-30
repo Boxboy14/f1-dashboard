@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Outlet,
   useNavigate,
   useParams,
   useSearchParams,
 } from "react-router-dom";
+import { Spinner } from "@salt-ds/core";
 import { createDriverSlug } from "../../../store/drivers/utils.js";
 import Navbar from "../Navbar/Navbar.jsx";
 import Sidebar from "../Sidebar/Sidebar.jsx";
@@ -82,7 +83,17 @@ const DashboardLayout = () => {
           onToggleCollapse={() => setCollapsed((c) => !c)}
         />
         <main className={styles.content}>
-          <Outlet context={{ openDriverInfo, year }} />
+          <Suspense
+            fallback={
+              <Spinner
+                size="medium"
+                aria-label="Loading"
+                className={styles.routeFallback}
+              />
+            }
+          >
+            <Outlet context={{ openDriverInfo, year }} />
+          </Suspense>
         </main>
       </div>
       <DriverInfoCard
